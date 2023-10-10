@@ -2,8 +2,6 @@ package club.p6e.coat.file.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
