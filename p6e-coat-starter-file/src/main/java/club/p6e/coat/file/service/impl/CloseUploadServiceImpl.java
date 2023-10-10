@@ -1,5 +1,6 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.service.CloseUploadService;
 import club.p6e.coat.file.context.CloseUploadContext;
 import club.p6e.coat.file.Properties;
@@ -27,14 +28,13 @@ import java.util.Map;
 public class CloseUploadServiceImpl implements CloseUploadService {
 
     /**
-     * 配置文件对象
-     */
-    private final Properties properties;
-
-    /**
      * 上传存储库对象
      */
     private final UploadRepository repository;
+
+    private final Properties properties;
+
+    private final FileReadWriteService fileReadWriteService;
 
     /**
      * 构造方法初始化
@@ -42,19 +42,24 @@ public class CloseUploadServiceImpl implements CloseUploadService {
      * @param properties 配置文件对象
      * @param repository 上传存储库对象
      */
-    public CloseUploadServiceImpl(Properties properties, UploadRepository repository) {
-        this.properties = properties;
+    public CloseUploadServiceImpl(Properties properties, FileReadWriteService fileReadWriteService, UploadRepository repository) {
+        this.fileReadWriteService = fileReadWriteService;
         this.repository = repository;
+        this.properties = properties;
     }
 
     @Override
     public Mono<Map<String, Object>> execute(CloseUploadContext context) {
         return repository
                 .closeLock(context.getId())
-                .flatMap(c -> repository.findById(context.getId()))
+                .flatMap(l -> repository.findById(context.getId()))
                 .flatMap(m -> {
+                    final Object operator = context.get("operator");
+                    if (operator instanceof final String content) {
+                        m.setOperator(content);
+                    }
                     final String absolutePath = FileUtil.convertAbsolutePath(
-                            FileUtil.composePath(properties.getSliceUpload().getPath(), m.getStorageLocation()));
+                            FileUtil.composePath(properties.getSliceUpload().getPath(), String.valueOf(m.getId())));
                     final File[] files = FileUtil.readFolder(absolutePath);
                     for (int i = 0; i < files.length; i++) {
                         for (int j = i; j < files.length; j++) {
@@ -69,17 +74,15 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                             }
                         }
                     }
-                    final Object operator = context.get("operator");
-                    final long fileLength = FileUtil.obtainFileLength(files);
-                    if (operator instanceof final String content) {
-                        m.setOperator(content);
-                    }
-                    return repository.update(m.setSize(fileLength))
-                            .map(l -> {
-                                final Map<String, Object> map = m.toMap();
-                                map.put("files", files);
-                                return map;
-                            });
+                    return fileReadWriteService
+                            .write(m.getName(), m.toMap(), file -> FileUtil.mergeFileSlice(files, file))
+                            .flatMap(fm -> repository
+                                    .update(m
+                                            .setSize(fm.getLength())
+                                            .setStorageType(fm.getType())
+                                            .setStorageLocation(fm.getPath())
+                                    ))
+                            .map(l -> m.toMap());
                 });
     }
 

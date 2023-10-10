@@ -1,8 +1,8 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.file.error.ParameterException;
 import club.p6e.coat.file.service.OpenUploadService;
 import club.p6e.coat.file.context.OpenUploadContext;
-import club.p6e.coat.file.FolderStorageLocationPathService;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadRepository;
@@ -33,33 +33,17 @@ public class OpenUploadServiceImpl implements OpenUploadService {
     private static final String SOURCE = "SLICE_UPLOAD";
 
     /**
-     * 配置文件对象
-     */
-    private final Properties properties;
-
-    /**
      * 上传存储库对象
      */
     private final UploadRepository repository;
 
     /**
-     * 上传文件夹本地存储路径服务对象
-     */
-    private final FolderStorageLocationPathService folderPathService;
-
-    /**
      * 构造方法初始化
      *
-     * @param properties        配置文件对象
-     * @param repository        上传存储库对象
-     * @param folderPathService 上传文件夹本地存储路径服务对象
+     * @param repository 上传存储库对象
      */
-    public OpenUploadServiceImpl(Properties properties,
-                                 UploadRepository repository,
-                                 FolderStorageLocationPathService folderPathService) {
-        this.properties = properties;
+    public OpenUploadServiceImpl(UploadRepository repository) {
         this.repository = repository;
-        this.folderPathService = folderPathService;
     }
 
     @Override
@@ -70,21 +54,18 @@ public class OpenUploadServiceImpl implements OpenUploadService {
             model.setOwner(content);
             model.setOperator(content);
         }
-        final String path = folderPathService.path();
         final String name = FileUtil.name(context.getName());
-        final String absolutePath = FileUtil.convertAbsolutePath(
-                FileUtil.composePath(properties.getSliceUpload().getPath(), path));
+        if (name == null) {
+            return Mono.error(new ParameterException(
+                    this.getClass(),
+                    "fun execute(OpenUploadContext context)." +
+                            "-> <name> Request parameter format error.",
+                    "<name> Request parameter format error")
+            );
+        }
         model.setName(name);
         model.setSource(SOURCE);
-        model.setStorageLocation(path);
-        return repository
-                .create(model)
-                .map(m -> {
-                    // 如果创建数据成功就创建文件夹
-                    FileUtil.createFolder(absolutePath);
-                    return m;
-                })
-                .map(UploadModel::toMap);
+        return repository.create(model).map(UploadModel::toMap);
     }
 
 }

@@ -20,6 +20,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 )
 public class DownloadRouterFunction extends BaseRouterFunction implements RouterFunction<ServerResponse> {
 
+    /**
+     * 构造方法初始化
+     *
+     * @param handlerFunction 处理器函数对象
+     */
     public DownloadRouterFunction(DownloadHandlerFunction handlerFunction) {
         super(RequestPredicates.GET("/download"), handlerFunction);
     }

@@ -25,8 +25,7 @@ public class DefaultDownloadAspectImpl implements DownloadAspect {
     }
 
     @Override
-    public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
+    public Mono<Boolean> after(Map<String, Object> data) {
         return Mono.just(true);
     }
-
 }

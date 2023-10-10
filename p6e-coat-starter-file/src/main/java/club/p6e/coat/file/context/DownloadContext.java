@@ -1,5 +1,7 @@
 package club.p6e.coat.file.context;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.Map;
  * @author lidashuang
  * @version 1.0
  */
+@Getter
 public class DownloadContext extends HashMap<String, Object> implements Serializable {
 
     /**
@@ -29,7 +32,7 @@ public class DownloadContext extends HashMap<String, Object> implements Serializ
     }
 
     /**
-     * map 初始化构造
+     * 构造函数初始化
      *
      * @param map 初始化对象
      */
@@ -43,17 +46,9 @@ public class DownloadContext extends HashMap<String, Object> implements Serializ
         }
     }
 
-    public String getNode() {
-        return node;
-    }
-
     public void setNode(String node) {
         this.node = node;
         this.put("node", node);
-    }
-
-    public String getPath() {
-        return path;
     }
 
     public void setPath(String path) {

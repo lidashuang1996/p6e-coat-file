@@ -1,6 +1,8 @@
 package club.p6e.coat.file.service;
 
+import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.context.DownloadContext;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -19,6 +21,6 @@ public interface DownloadService {
      * @param context 下载上下文对象
      * @return 结果对象
      */
-    public Mono<Map<String, Object>> execute(DownloadContext context);
+    public Mono<FileReadWriteService.FileReadActuator> execute(DownloadContext context);
 
 }

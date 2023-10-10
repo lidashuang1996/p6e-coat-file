@@ -1,6 +1,8 @@
 package club.p6e.coat.file.service;
 
+import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.context.ResourceContext;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -19,6 +21,6 @@ public interface ResourceService {
      * @param context 资源上下文对象
      * @return 结果对象
      */
-    public Mono<Map<String, Object>> execute(ResourceContext context);
+    public Mono<FileReadWriteService.FileReadActuator> execute(ResourceContext context);
 
 }

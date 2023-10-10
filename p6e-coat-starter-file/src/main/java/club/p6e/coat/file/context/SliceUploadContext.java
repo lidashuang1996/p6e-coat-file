@@ -1,5 +1,6 @@
 package club.p6e.coat.file.context;
 
+import lombok.Getter;
 import org.springframework.http.codec.multipart.FilePart;
 
 import java.io.Serializable;
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author lidashuang
  * @version 1.0
  */
+@Getter
 public class SliceUploadContext extends HashMap<String, Object> implements Serializable {
 
     /**
@@ -41,7 +43,7 @@ public class SliceUploadContext extends HashMap<String, Object> implements Seria
     }
 
     /**
-     * map 初始化构造
+     * 构造函数初始化
      *
      * @param map 初始化对象
      */
@@ -61,17 +63,9 @@ public class SliceUploadContext extends HashMap<String, Object> implements Seria
         }
     }
 
-    public Integer getId() {
-        return id;
-    }
-
     public void setId(Integer id) {
         this.id = id;
         this.put("id", id);
-    }
-
-    public Integer getIndex() {
-        return index;
     }
 
     public void setIndex(Integer index) {
@@ -79,22 +73,18 @@ public class SliceUploadContext extends HashMap<String, Object> implements Seria
         this.put("index", index);
     }
 
-    public String getSignature() {
-        return signature;
-    }
-
     public void setSignature(String signature) {
         this.signature = signature;
         this.put("signature", signature);
     }
 
-    public FilePart getFilePart() {
-        return filePart;
-    }
-
     public void setFilePart(FilePart filePart) {
-        this.filePart = filePart;
-        this.put("filePart", filePart);
+        if (filePart == null) {
+            remove("filePart");
+        } else {
+            this.filePart = filePart;
+            this.put("filePart", filePart);
+        }
     }
 
     public Map<String, Object> toMap() {

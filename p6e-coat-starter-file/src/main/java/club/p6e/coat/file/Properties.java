@@ -37,6 +37,8 @@ public class Properties implements Serializable {
      */
     private Map<String, Resource> resources = new HashMap<>();
 
+    private Map<String, Upload> upload = new HashMap<>();
+
     /**
      * 下载配置
      */
@@ -47,15 +49,27 @@ public class Properties implements Serializable {
      */
     @Data
     @Accessors(chain = true)
-    public static class Download implements Serializable {
-
+    public static class Upload implements Serializable {
         /**
          * 基础的文件路径
          */
+        private String type;
         private String path;
+        private Map<String, String> extend;
 
     }
 
+    @Data
+    @Accessors(chain = true)
+    public static class Download implements Serializable {
+        /**
+         * 基础的文件路径
+         */
+        private String type;
+        private String path;
+        private Map<String, String> extend;
+
+    }
     /**
      * 资源
      */
@@ -66,7 +80,9 @@ public class Properties implements Serializable {
         /**
          * 基础的文件路径
          */
+        private String type;
         private String path;
+        private Map<String, String> extend;
 
         /**
          * 允许的文件后缀以及对应的媒体类型

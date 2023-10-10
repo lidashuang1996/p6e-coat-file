@@ -1,5 +1,7 @@
 package club.p6e.coat.file.context;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +12,7 @@ import java.util.Map;
  * @author lidashuang
  * @version 1.0
  */
+@Getter
 public class CloseUploadContext extends HashMap<String, Object> implements Serializable {
 
     /**
@@ -24,7 +27,7 @@ public class CloseUploadContext extends HashMap<String, Object> implements Seria
     }
 
     /**
-     * map 初始化构造
+     * 构造函数初始化
      *
      * @param map 初始化对象
      */
@@ -33,10 +36,6 @@ public class CloseUploadContext extends HashMap<String, Object> implements Seria
         if (map.get("id") != null && map.get("id") instanceof final Integer content) {
             this.setId(content);
         }
-    }
-
-    public Integer getId() {
-        return id;
     }
 
     public void setId(Integer id) {

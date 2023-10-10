@@ -1,0 +1,18 @@
+2023-10-10 17:20:06 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 62264 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
+2023-10-10 17:20:06 [main] INFO - No active profile set, falling back to 1 default profile: "default"
+2023-10-10 17:20:07 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 3 MT: 5 >>> XXXX-XX-XX 03:5X:XX
+2023-10-10 17:20:07 [main] INFO - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2023-10-10 17:35:44 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 44136 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
+2023-10-10 17:35:44 [main] INFO - No active profile set, falling back to 1 default profile: "default"
+2023-10-10 17:35:45 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 3 MT: 1 >>> XXXX-XX-XX 03:1X:XX
+2023-10-10 17:35:45 [main] INFO - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2023-10-10 17:36:08 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 108720 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
+2023-10-10 17:36:08 [main] INFO - No active profile set, falling back to 1 default profile: "default"
+2023-10-10 17:36:08 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 0 MT: 5 >>> XXXX-XX-XX 00:5X:XX
+2023-10-10 17:36:08 [main] INFO - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.

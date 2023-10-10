@@ -1,5 +1,6 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.service.ResourceService;
 import club.p6e.coat.file.context.ResourceContext;
 import club.p6e.coat.file.error.ResourceNodeException;
@@ -30,18 +31,20 @@ public class ResourceServiceImpl implements ResourceService {
      * 配置文件对象
      */
     private final Properties properties;
+    private final FileReadWriteService fileReadWriteService;
 
     /**
      * 构造方法初始化
      *
      * @param properties 配置文件对象
      */
-    public ResourceServiceImpl(Properties properties) {
+    public ResourceServiceImpl(Properties properties, FileReadWriteService fileReadWriteService) {
         this.properties = properties;
+        this.fileReadWriteService = fileReadWriteService;
     }
 
     @Override
-    public Mono<Map<String, Object>> execute(ResourceContext context) {
+    public Mono<FileReadWriteService.FileReadActuator> execute(ResourceContext context) {
         final Properties.Resource resource = properties.getResources().get(context.getNode());
         if (resource == null) {
             return Mono.error(new ResourceNodeException(
@@ -52,19 +55,14 @@ public class ResourceServiceImpl implements ResourceService {
             );
         } else {
             final String path = context.getPath();
-            final String node = context.getNode();
             final String suffix = FileUtil.getSuffix(path);
             final Map<String, MediaType> suffixes = resource.getSuffixes();
             if (suffixes.get(suffix) != null) {
                 final MediaType mediaType = suffixes.get(suffix);
-                final Map<String, Object> result = new HashMap<>(3);
-                result.put("path", path);
-                result.put("node", node);
-                result.put("__media_type__", mediaType);
-                result.put("__path__", FileUtil.convertAbsolutePath(
-                        FileUtil.composePath(resource.getPath(), context.getPath())
-                ));
-                return Mono.just(result);
+                final Map<String, Object> data = new HashMap<>();
+                data.putAll(resource.getExtend());
+                data.putAll(context.toMap());
+                return fileReadWriteService.read(resource.getType(), resource.getPath(), path, mediaType, data);
             } else {
                 return Mono.error(new ResourceNodeException(
                         this.getClass(),

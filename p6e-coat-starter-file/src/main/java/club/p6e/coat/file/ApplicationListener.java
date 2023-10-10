@@ -30,11 +30,6 @@ public class ApplicationListener implements
     public void onApplicationEvent(ApplicationReadyEvent event) {
         // 初始化上下文对象
         SpringUtil.init(event.getApplicationContext());
-        try {
-            SpringUtil.getBean(BannerService.class).execute();
-        } catch (Exception e) {
-            // 忽略异常
-        }
         // 打印配置文件的信息
         final Properties properties = SpringUtil.getBean(Properties.class);
         LOGGER.info("=============================================================");

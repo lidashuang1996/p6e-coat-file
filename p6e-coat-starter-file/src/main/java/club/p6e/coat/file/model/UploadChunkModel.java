@@ -15,7 +15,6 @@ import java.util.Map;
  * @version 1.0
  */
 @Data
-@Table(UploadChunkModel.TABLE)
 @Accessors(chain = true)
 public class UploadChunkModel implements Serializable {
 
@@ -28,7 +27,6 @@ public class UploadChunkModel implements Serializable {
     public static final String DATE = "date";
     public static final String OPERATOR = "operator";
 
-    @Id
     private Integer id;
     private Integer fid;
     private String name;

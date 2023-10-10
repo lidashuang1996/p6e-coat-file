@@ -2,8 +2,6 @@ package club.p6e.coat.file.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -17,7 +15,6 @@ import java.util.Map;
  * @version 1.0
  */
 @Data
-@Table(UploadModel.TABLE)
 @Accessors(chain = true)
 public class UploadModel implements Serializable {
 
@@ -36,11 +33,11 @@ public class UploadModel implements Serializable {
     public static final String VERSION = "version";
     public static final String RUBBISH = "rubbish";
 
-    @Id
     private Integer id;
     private String name;
     private Long size;
     private String source;
+    private String storageType;
     private String storageLocation;
     private String owner;
     private LocalDateTime createDate;

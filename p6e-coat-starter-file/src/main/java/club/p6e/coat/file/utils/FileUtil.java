@@ -511,6 +511,21 @@ public final class FileUtil {
         }
     }
 
+    public static Mono<File> mergeFileSlice(File[] files, File file) {
+        if (files == null
+                || file == null
+                || files.length == 0) {
+            return Mono.empty();
+        } else {
+            if (checkFileExist(file)) {
+                deleteFile(file);
+            }
+            return writeFile(Flux.concat(
+                    Arrays.stream(files).map(FileUtil::readFile).toList()
+            ), file).then(Mono.just(file));
+        }
+    }
+
     /**
      * 获取文件名称
      *

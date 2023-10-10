@@ -27,7 +27,7 @@ public class OpenUploadContext extends HashMap<String, Object> implements Serial
     }
 
     /**
-     * map 初始化构造
+     * 构造函数初始化
      *
      * @param map 初始化对象
      */

@@ -20,6 +20,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 )
 public class ResourceRouterFunction extends BaseRouterFunction implements RouterFunction<ServerResponse> {
 
+    /**
+     * 构造方法初始化
+     *
+     * @param handlerFunction 处理器函数对象
+     */
     public ResourceRouterFunction(ResourceHandlerFunction handlerFunction) {
         super(RequestPredicates.GET("/resource"), handlerFunction);
     }

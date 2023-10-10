@@ -61,9 +61,11 @@ public class SliceUploadServiceImpl implements SliceUploadService {
      * @param uploadRepository      上传存储库对象
      * @param uploadChunkRepository 上传块存储库对象
      */
-    public SliceUploadServiceImpl(Properties properties,
-                                  UploadRepository uploadRepository,
-                                  UploadChunkRepository uploadChunkRepository) {
+    public SliceUploadServiceImpl(
+            Properties properties,
+            UploadRepository uploadRepository,
+            UploadChunkRepository uploadChunkRepository
+    ) {
         this.properties = properties;
         this.uploadRepository = uploadRepository;
         this.uploadChunkRepository = uploadChunkRepository;
@@ -84,7 +86,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                             final UploadRepository repository = SpringUtil.getBean(UploadRepository.class);
                             // 文件绝对路径
                             final String absolutePath = FileUtil.convertAbsolutePath(FileUtil.composePath(
-                                    properties.getSliceUpload().getPath(), um.getStorageLocation()));
+                                    properties.getSliceUpload().getPath(), String.valueOf(um.getId())));
                             // 如果不存在文件夹就创建文件夹
                             if (!FileUtil.checkFolderExist(absolutePath)) {
                                 FileUtil.createFolder(absolutePath);

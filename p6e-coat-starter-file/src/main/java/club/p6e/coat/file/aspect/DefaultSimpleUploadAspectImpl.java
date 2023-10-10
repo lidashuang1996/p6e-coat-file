@@ -28,11 +28,15 @@ public class DefaultSimpleUploadAspectImpl implements SimpleUploadAspect {
     @Override
     public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
         final Object id = result.get("id");
-        final String fileName = String.valueOf(result.get("name"));
+        final String name = String.valueOf(result.get("name"));
+        final String storageType = String.valueOf(result.get("storageType"));
         final String storageLocation = String.valueOf(result.get("storageLocation"));
         result.clear();
         result.put("id", id);
-        result.put("path", FileUtil.composePath(storageLocation, fileName));
+        result.put("name", name);
+        result.put("storageType", storageType);
+        result.put("storageLocation", storageLocation);
+        result.put("path", FileUtil.composePath(storageLocation, name));
         return Mono.just(true);
     }
 

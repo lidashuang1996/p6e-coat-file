@@ -25,8 +25,7 @@ public class DefaultResourceAspectImpl implements ResourceAspect {
     }
 
     @Override
-    public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
+    public Mono<Boolean> after(Map<String, Object> data) {
         return Mono.just(true);
     }
-
 }

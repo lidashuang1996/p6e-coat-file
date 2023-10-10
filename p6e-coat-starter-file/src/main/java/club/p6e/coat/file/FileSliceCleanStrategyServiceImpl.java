@@ -79,7 +79,7 @@ public class FileSliceCleanStrategyServiceImpl implements FileSliceCleanStrategy
         LOGGER.info("[ TASK ] Start executing file purge scheduled task. localDateTime => " + localDateTime);
         while (status.get()) {
             uploadRepository
-                    .findByIdAndCreateDateOne(id.get(), null, localDateTime)
+                    .findByIdAndCreateDateOne(id.get(), null)
                     .map(m -> {
                         id.set(m.getId());
                         return m;
