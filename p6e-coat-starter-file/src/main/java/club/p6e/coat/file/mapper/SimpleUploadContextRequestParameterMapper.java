@@ -28,6 +28,11 @@ import java.util.List;
 public class SimpleUploadContextRequestParameterMapper extends RequestParameterMapper {
 
     /**
+     * NODE 请求参数
+     */
+    private static final String NODE_PARAMETER_NAME = "node";
+
+    /**
      * FORM DATA 文件请求参数
      */
     private static final String FORM_DATA_PARAMETER_FILE = "file";
@@ -57,9 +62,24 @@ public class SimpleUploadContextRequestParameterMapper extends RequestParameterM
         return requestFormDataMapper(request, context.toMap())
                 .flatMap(m -> {
                     final SimpleUploadContext newContext = new SimpleUploadContext(m);
+                    if (newContext.getNode() == null) {
+                        final Object o = newContext.get(FORM_DATA_PREFIX + NODE_PARAMETER_NAME);
+                        if (o instanceof final List<?> ol && !ol.isEmpty()
+                                && ol.get(0) instanceof final String content) {
+                            System.out.println(content);
+                            newContext.setNode(content);
+                        } else {
+                            // 如果没有读取到了 FORM DATA SIGNATURE 请求参数那么就抛出参数异常
+                            return Mono.error(new ParameterException(
+                                    this.getClass(),
+                                    "fun execute(ServerRequest request).",
+                                    "<" + NODE_PARAMETER_NAME + "> Request parameter is null"
+                            ));
+                        }
+                    }
                     // 读取 FORM DATA 文件请求参数
                     final Object o = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_FILE);
-                    if (o instanceof final List<?> ol && ol.size() > 0
+                    if (o instanceof final List<?> ol && !ol.isEmpty()
                             && ol.get(0) instanceof final FilePart filePart) {
                         // 如果读取到了 FORM DATA 文件请求参数那么就写入到上下文对象中
                         newContext.setFilePart(filePart);

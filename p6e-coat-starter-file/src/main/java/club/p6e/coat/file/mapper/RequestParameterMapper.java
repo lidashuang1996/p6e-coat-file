@@ -10,7 +10,6 @@ import org.springframework.http.codec.multipart.Part;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 
-import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -61,7 +60,7 @@ public abstract class RequestParameterMapper {
      * @param <T>     映射的数据类型
      * @return 映射的数据类型对象的泛型
      */
-    @SuppressWarnings("all")
+    @SuppressWarnings("ALL")
     public static <T> Mono<T> execute(ServerRequest request, Class<T> oClass) {
         if (!IS_REFRESH_CACHE) {
             refresh();
@@ -112,7 +111,7 @@ public abstract class RequestParameterMapper {
      * @param data    保存的结果的数据对象
      * @return 结果的数据对象
      */
-    @SuppressWarnings("all")
+    @SuppressWarnings("ALL")
     public static Mono<Map<String, Object>> requestFormDataMapper(ServerRequest request, Map<String, Object> data) {
         return request
                 .exchange()
@@ -148,9 +147,9 @@ public abstract class RequestParameterMapper {
     public static Mono<Map<String, Object>> requestRawJsonMapper(ServerRequest request, Map<String, Object> data) {
         return DataBufferUtils.join(request.exchange().getRequest().getBody())
                 .map(buffer -> {
-                    final CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer.toByteBuffer());
+                    final Map<String, Object> jsonMapData = JsonUtil.fromJsonToMap(
+                            buffer.toString(StandardCharsets.UTF_8), String.class, Object.class);
                     DataBufferUtils.release(buffer);
-                    final Map<String, Object> jsonMapData = JsonUtil.fromJsonToMap(charBuffer.toString(), String.class, Object.class);
                     if (jsonMapData != null) {
                         for (final String key : jsonMapData.keySet()) {
                             data.put(RAW_JSON_PREFIX + key, jsonMapData.get(key));

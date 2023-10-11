@@ -1,5 +1,7 @@
 package club.p6e.coat.file;
 
+import club.p6e.coat.file.task.FileSliceCleanTaskStrategyService;
+import club.p6e.coat.file.task.FileSliceCleanTask;
 import club.p6e.coat.file.utils.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,22 +55,13 @@ public class ApplicationListener implements
         LOGGER.info("sliceUpload:");
         LOGGER.info("     path:" + sliceUpload.getPath());
         LOGGER.info("     maxSize:" + sliceUpload.getMaxSize());
-        final Properties.SimpleUpload simpleUpload = properties.getSimpleUpload();
         LOGGER.info("simpleUpload:");
-        LOGGER.info("     path:" + simpleUpload.getPath());
-        LOGGER.info("     maxSize:" + simpleUpload.getMaxSize());
         LOGGER.info("--------- " + Properties.class + " ---------");
         LOGGER.info("=============================================================");
         LOGGER.info("=============================================================");
-        if (SpringUtil.existBean(FileSliceCleanTask.class)) {
-            final FileSliceCleanStrategyService strategy = SpringUtil.getBean(FileSliceCleanStrategyService.class);
-            LOGGER.info("File slice cleaning task enabled.");
-            LOGGER.info("File slice cleaning task strategy is [ " + strategy.getClass() + " ].");
-        } else {
-            LOGGER.warn("The file slice cleaning task is not enabled.");
-            LOGGER.warn("If you need to start it, please inject [ "
-                    + FileSliceCleanTask.class + " ] into the Spring Bean factory.");
-        }
+        final FileSliceCleanTaskStrategyService strategy = SpringUtil.getBean(FileSliceCleanTaskStrategyService.class);
+        LOGGER.info("File slice cleaning task enabled.");
+        LOGGER.info("File slice cleaning task strategy is [ " + strategy.getClass() + " ].");
         LOGGER.info("=============================================================");
         LOGGER.info("Initialization completed.");
     }

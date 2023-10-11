@@ -100,7 +100,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                     final SliceUploadContext newContext = new SliceUploadContext(m);
                     if (newContext.getId() == null) {
                         final Object fdId = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_ID);
-                        if (fdId instanceof final List<?> ol && ol.size() > 0
+                        if (fdId instanceof final List<?> ol && !ol.isEmpty()
                                 && ol.get(0) instanceof final String content) {
                             try {
                                 newContext.setId(Integer.valueOf(content));
@@ -125,7 +125,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                     }
                     if (newContext.getIndex() == null) {
                         final Object fdIndex = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_INDEX);
-                        if (fdIndex instanceof final List<?> ol && ol.size() > 0
+                        if (fdIndex instanceof final List<?> ol && !ol.isEmpty()
                                 && ol.get(0) instanceof final String content) {
                             try {
                                 newContext.setIndex(Integer.valueOf(content));
@@ -150,7 +150,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                     }
                     if (newContext.getSignature() == null) {
                         final Object fdSignature = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_SIGNATURE);
-                        if (fdSignature instanceof final List<?> ol && ol.size() > 0
+                        if (fdSignature instanceof final List<?> ol && !ol.isEmpty()
                                 && ol.get(0) instanceof final String content) {
                             newContext.setSignature(content);
                         } else {
@@ -164,7 +164,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                     }
                     final Object fdFile = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_FILE);
                     if (fdFile instanceof final List<?> ol
-                            && ol.size() > 0 && ol.get(0) instanceof final FilePart fp) {
+                            && !ol.isEmpty() && ol.get(0) instanceof final FilePart fp) {
                         newContext.setFilePart(fp);
                     } else {
                         // 如果没有读取到了 FORM DATA 文件请求参数那么就抛出参数异常
@@ -199,7 +199,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         if (context.getId() == null) {
             // 读取 URL ID 请求参数
             final List<String> ids = queryParams.get(URL_PARAMETER_ID);
-            if (ids != null && ids.size() > 0) {
+            if (ids != null && !ids.isEmpty()) {
                 try {
                     // 如果读取到了 URL ID 那么就写入到上下文对象中
                     context.setId(Integer.valueOf(ids.get(0)));
@@ -220,7 +220,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         // 读取 URL INDEX 请求参数
         final MultiValueMap<String, String> queryParams = request.exchange().getRequest().getQueryParams();
         final List<String> indexes = queryParams.get(URL_PARAMETER_INDEX);
-        if (indexes != null && indexes.size() > 0) {
+        if (indexes != null && !indexes.isEmpty()) {
             try {
                 // 如果读取到了 URL INDEX 那么就写入到上下文对象中
                 context.setIndex(Integer.valueOf(indexes.get(0)));
@@ -240,7 +240,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         final MultiValueMap<String, String> queryParams = request.exchange().getRequest().getQueryParams();
         // 读取 URL SIGNATURE 请求参数
         final List<String> signatures = queryParams.get(URL_PARAMETER_SIGNATURE);
-        if (signatures != null && signatures.size() > 0) {
+        if (signatures != null && !signatures.isEmpty()) {
             // 如果读取到了 URL SIGNATURE 那么就写入到上下文对象中
             context.setSignature(signatures.get(0));
         }

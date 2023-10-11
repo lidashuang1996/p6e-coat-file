@@ -1,11 +1,11 @@
-2023-10-10 17:20:06 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 62264 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
-2023-10-10 17:20:06 [main] INFO - No active profile set, falling back to 1 default profile: "default"
-2023-10-10 17:20:07 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 3 MT: 5 >>> XXXX-XX-XX 03:5X:XX
-2023-10-10 17:20:07 [main] WARN - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'club.p6e.coat.file.config.ConnectionFactory' defined in class path resource [club/p6e/coat/file/config/R2dbcConfig.class]: Unsatisfied dependency expressed through method 'injectConnectionFactory' parameter 0: Error creating bean with name 'club.p6e.coat.file.config.ConnectionFactory': Requested bean is currently in creation: Is there an unresolvable circular reference?
-2023-10-10 17:20:07 [main] INFO - 
+2023-10-11 09:44:34 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 17252 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
+2023-10-11 09:44:34 [main] INFO - No active profile set, falling back to 1 default profile: "default"
+2023-10-11 09:44:35 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 5 MT: 3 >>> XXXX-XX-XX 05:3X:XX
+2023-10-11 09:44:35 [main] WARN - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'connectionFactory' defined in class path resource [org/springframework/boot/autoconfigure/r2dbc/ConnectionFactoryConfigurations$GenericConfiguration.class]: Failed to instantiate [io.r2dbc.spi.ConnectionFactory]: Factory method 'connectionFactory' threw exception with message: R2DBC connection pooling has been configured but the io.r2dbc.pool.ConnectionPool class is not present.
+2023-10-11 09:44:35 [main] INFO - 
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2023-10-10 17:20:07 [main] ERROR - 
+2023-10-11 09:44:35 [main] ERROR - 
 
 ***************************
 APPLICATION FAILED TO START
@@ -13,100 +13,19 @@ APPLICATION FAILED TO START
 
 Description:
 
-The dependencies of some of the beans in the application context form a cycle:
-
-   closeUploadHandlerFunction defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]
-      ↓
-   closeUploadServiceImpl defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]
-      ↓
-   uploadRepository defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]
-┌─────┐
-|  club.p6e.coat.file.config.ConnectionFactory defined in class path resource [club/p6e/coat/file/config/R2dbcConfig.class]
-└─────┘
-
+R2DBC connection pooling has been configured but the io.r2dbc.pool.ConnectionPool class is not present.
 
 Action:
 
-Relying upon circular references is discouraged and they are prohibited by default. Update your application to remove the dependency cycle between beans. As a last resort, it may be possible to break the cycle automatically by setting spring.main.allow-circular-references to true.
+Update your application's build to depend on io.r2dbc:r2dbc-pool or your application's configuration to disable R2DBC connection pooling.
 
-2023-10-10 17:35:44 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 44136 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
-2023-10-10 17:35:44 [main] INFO - No active profile set, falling back to 1 default profile: "default"
-2023-10-10 17:35:45 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 3 MT: 1 >>> XXXX-XX-XX 03:1X:XX
-2023-10-10 17:35:45 [main] WARN - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'io.r2dbc.spi.ConnectionFactory' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("club.p6e.coat.file.config.ConnectionFactory")}
-2023-10-10 17:35:45 [main] INFO - 
-
-Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2023-10-10 17:35:45 [main] ERROR - Application run failed
-org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'io.r2dbc.spi.ConnectionFactory' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("club.p6e.coat.file.config.ConnectionFactory")}
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:245) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1189) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:560) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:520) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:973) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:941) ~[spring-context-6.0.9.jar:6.0.9]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:608) ~[spring-context-6.0.9.jar:6.0.9]
-	at org.springframework.boot.web.reactive.context.ReactiveWebServerApplicationContext.refresh(ReactiveWebServerApplicationContext.java:66) ~[spring-boot-3.1.0.jar:3.1.0]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:733) ~[spring-boot-3.1.0.jar:3.1.0]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:435) ~[spring-boot-3.1.0.jar:3.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:311) ~[spring-boot-3.1.0.jar:3.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1305) ~[spring-boot-3.1.0.jar:3.1.0]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1294) ~[spring-boot-3.1.0.jar:3.1.0]
-	at club.p6e.coat.file.P6eCoatFileApplication.main(P6eCoatFileApplication.java:17) ~[classes/:na]
-Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'io.r2dbc.spi.ConnectionFactory' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("club.p6e.coat.file.config.ConnectionFactory")}
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:245) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1189) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:560) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:520) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1417) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1337) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:888) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.0.9.jar:6.0.9]
-	... 19 common frames omitted
-Caused by: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'io.r2dbc.spi.ConnectionFactory' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("club.p6e.coat.file.config.ConnectionFactory")}
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:800) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:245) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1352) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1189) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:560) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:520) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:326) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:324) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1417) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1337) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:888) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.0.9.jar:6.0.9]
-	... 33 common frames omitted
-Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'io.r2dbc.spi.ConnectionFactory' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("club.p6e.coat.file.config.ConnectionFactory")}
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:1824) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1383) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1337) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:888) ~[spring-beans-6.0.9.jar:6.0.9]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-6.0.9.jar:6.0.9]
-	... 47 common frames omitted
-2023-10-10 17:36:08 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 108720 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
-2023-10-10 17:36:08 [main] INFO - No active profile set, falling back to 1 default profile: "default"
-2023-10-10 17:36:08 [main] INFO - [ FILE CLEAN ] INIT ==> HT: 0 MT: 5 >>> XXXX-XX-XX 00:5X:XX
-2023-10-10 17:36:08 [main] WARN - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 2: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'connectionFactory' defined in class path resource [org/springframework/boot/autoconfigure/r2dbc/ConnectionFactoryConfigurations$GenericConfiguration.class]: Failed to instantiate [io.r2dbc.spi.ConnectionFactory]: Factory method 'connectionFactory' threw exception with message: R2DBC connection pooling has been configured but the io.r2dbc.pool.ConnectionPool class is not present.
-2023-10-10 17:36:08 [main] INFO - 
+2023-10-11 11:21:45 [main] INFO - Starting P6eCoatFileApplication using Java 17.0.7 with PID 29012 (D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes started by a1294 in D:\CodeContents\github\p6e-coat-file)
+2023-10-11 11:21:45 [main] INFO - No active profile set, falling back to 1 default profile: "default"
+2023-10-11 11:21:46 [main] WARN - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'closeUploadHandlerFunction' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\handler\CloseUploadHandlerFunction.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'closeUploadServiceImpl' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\service\impl\CloseUploadServiceImpl.class]: Unsatisfied dependency expressed through constructor parameter 1: Error creating bean with name 'uploadRepository' defined in file [D:\CodeContents\github\p6e-coat-file\p6e-coat-starter-file\target\classes\club\p6e\coat\file\repository\UploadRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'connectionFactory' defined in class path resource [org/springframework/boot/autoconfigure/r2dbc/ConnectionFactoryConfigurations$GenericConfiguration.class]: Failed to instantiate [io.r2dbc.spi.ConnectionFactory]: Factory method 'connectionFactory' threw exception with message: R2DBC connection pooling has been configured but the io.r2dbc.pool.ConnectionPool class is not present.
+2023-10-11 11:21:46 [main] INFO - 
 
 Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
-2023-10-10 17:36:08 [main] ERROR - 
+2023-10-11 11:21:46 [main] ERROR - 
 
 ***************************
 APPLICATION FAILED TO START

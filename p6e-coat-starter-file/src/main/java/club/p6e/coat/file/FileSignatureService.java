@@ -29,9 +29,8 @@ public interface FileSignatureService {
          * 输入签名内容
          *
          * @param bytes 签名内容
-         * @return 摘要算法对象
          */
-        public DigestAlgorithm input(byte[] bytes);
+        public void input(byte[] bytes);
 
         /**
          * 获取签名结果

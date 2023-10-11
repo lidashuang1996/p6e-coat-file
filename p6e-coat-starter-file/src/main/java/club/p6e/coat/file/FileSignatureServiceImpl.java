@@ -85,9 +85,8 @@ public class FileSignatureServiceImpl implements FileSignatureService {
         }
 
         @Override
-        public DefaultDigestAlgorithm input(byte[] bytes) {
+        public void input(byte[] bytes) {
             md.update(bytes);
-            return this;
         }
 
         @Override

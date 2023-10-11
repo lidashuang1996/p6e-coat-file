@@ -1,64 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Title</title>
-	<style>
-      .box {
-          width: 680px;
-          margin: 0 auto 24px;
-          border: 1px solid #ccc;
-          padding: 24px 24px;
-      }
-	</style>
-	<script type="text/javascript" src="./crypto-js.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .box {
+            width: 680px;
+            margin: 0 auto 24px;
+            border: 1px solid #ccc;
+            padding: 24px 24px;
+        }
+    </style>
+    <script type="text/javascript" src="./crypto-js.min.js"></script>
 </head>
 <body>
 
 <div class="box">
-	<p>下载</p>
-	<p>
-		<span>NODE</span>
-		<input type="text" value="test" id="download-node" name="download-node"/>
-	</p>
-	<p>
-		<span>PATH</span>
-		<input type="text" value="" id="download-path" name="download-path"/>
-	</p>
-	<p>
-		<button id="download-button" onclick="downloadEvent()">确定</button>
-	</p>
+    <p>下载</p>
+    <p>
+        <span>NODE</span>
+        <input type="text" value="test" id="download-node" name="download-node"/>
+    </p>
+    <p>
+        <span>PATH</span>
+        <input type="text" value="" id="download-path" name="download-path"/>
+    </p>
+    <p>
+        <button id="download-button" onclick="downloadEvent()">确定</button>
+    </p>
 </div>
 
 <div class="box">
-	<p>查看</p>
-	<p>
-		<span>NODE</span>
-		<input type="text" value="test" id="resource-node" name="resource-node"/>
-	</p>
-	<p>
-		<span>PATH</span>
-		<input type="text" value="" id="resource-path" name="resource-path"/>
-	</p>
-	<p>
-		<button onclick="resourceEvent()">确定</button>
-	</p>
+    <p>查看</p>
+    <p>
+        <span>NODE</span>
+        <input type="text" value="test" id="resource-node" name="resource-node"/>
+    </p>
+    <p>
+        <span>PATH</span>
+        <input type="text" value="" id="resource-path" name="resource-path"/>
+    </p>
+    <p>
+        <button onclick="resourceEvent()">确定</button>
+    </p>
 </div>
 
 <div class="box">
-	<p>简单上传（10M以下）</p>
-	<p>
-		<input type="file" id="upload-simple-file" name="upload-simple-file"/>
-	</p>
-	<button onclick="uploadSimpleFile()">确定</button>
+    <p>简单上传（10M以下）</p>
+    <p>
+        <input type="file" id="upload-simple-file" name="upload-simple-file"/>
+    </p>
+    <button onclick="uploadSimpleFile()">确定</button>
 </div>
 
 <div class="box">
-	<p>分片上传 [<span id="upload-slice-file-span">0</span>]</p>
-	<p>
-		<input type="file" id="upload-slice-file" name="upload-slice-file"/>
-	</p>
-	<button onclick="uploadSliceFile()">执行</button>
+    <p>分片上传 [<span id="upload-slice-file-span">0</span>]</p>
+    <p>
+        <input type="file" id="upload-slice-file" name="upload-slice-file"/>
+    </p>
+    <button onclick="uploadSliceFile()">执行</button>
 </div>
 </body>
 
@@ -86,6 +86,7 @@
     const uploadSimpleFile = () => {
         // 创建 FormData 对象并添加文件数据
         const formData = new FormData();
+        formData.set("node", "test")
         formData.set("file", document.getElementById('upload-simple-file').files[0]);
         const xhr = new XMLHttpRequest();
         xhr.open("POST", BASE_URL + "/upload/simple");
@@ -159,11 +160,11 @@
     const uploadSliceFileEnd = async (id) => {
         return await new Promise(resolve => {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", BASE_URL + "/upload/slice/close/" + id);
+            xhr.open("POST", BASE_URL + "/upload/slice/close/" + id + "?node=test");
             xhr.onload = () => {
                 if (xhr.status === 200) {
                     document.getElementById('upload-slice-file-span').innerText = '100';
-					console.log(xhr);
+                    console.log(xhr);
                     resolve(JSON.parse(xhr.response))
                 } else {
                     resolve();

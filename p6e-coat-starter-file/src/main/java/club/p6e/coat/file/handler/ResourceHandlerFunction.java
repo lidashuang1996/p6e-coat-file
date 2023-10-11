@@ -60,22 +60,25 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
                 RequestParameterMapper.execute(request, ResourceContext.class)
                         // 执行下载操作之前的切点
                         .flatMap(c -> before(aspect, c.toMap()))
-                        .flatMap(m -> service.execute(new ResourceContext(m)))
+                        .flatMap(m -> service
+                                .execute(new ResourceContext(m))
+                                .flatMap(fra -> after(aspect, m, null).map(b -> fra)))
                         // 结果返回
                         .flatMap(fra -> {
                             final MediaType mediaType = fra.mediaType();
+                            final long length = fra.model().getLength();
                             final List<HttpRange> ranges = request.headers().range();
                             if (!ranges.isEmpty()) {
                                 final HttpRange range = ranges.get(0);
-                                final long el = range.getRangeEnd(fra.length());
-                                final long sl = range.getRangeStart(fra.length());
+                                final long el = range.getRangeEnd(length);
+                                final long sl = range.getRangeStart(length);
                                 final long cl = el - sl + 1;
                                 return ServerResponse
                                         .status(HttpStatus.PARTIAL_CONTENT)
                                         .contentLength(cl)
                                         .contentType(mediaType)
                                         .header(HttpHeaders.ACCEPT_RANGES, "bytes")
-                                        .header(HttpHeaders.CONTENT_RANGE, "bytes " + sl + "-" + el + "/" + fra.length())
+                                        .header(HttpHeaders.CONTENT_RANGE, "bytes " + sl + "-" + el + "/" + length)
                                         .body((response, context) -> response.writeWith(fra.execute(sl, cl)));
                             } else {
                                 return ServerResponse

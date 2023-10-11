@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
  * @author lidashuang
  * @version 1.0
  */
+@SuppressWarnings("ALL")
 public class BaseRouterFunction implements RouterFunction<ServerResponse> {
 
     /**

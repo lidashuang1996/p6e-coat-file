@@ -48,7 +48,7 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         context.putAll(queryParams);
         final List<String> nodes = queryParams.get(NODE_PARAMETER_NAME);
         final List<String> paths = queryParams.get(PATH_PARAMETER_NAME);
-        if (nodes != null && nodes.size() > 0) {
+        if (nodes != null && !nodes.isEmpty()) {
             context.setNode(nodes.get(0));
         } else {
             return Mono.error(new ParameterException(
@@ -58,10 +58,13 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
                     "<" + NODE_PARAMETER_NAME + "> Request parameter is null"
             ));
         }
-        if (paths != null && paths.size() > 0) {
+        if (paths != null && !paths.isEmpty()) {
             final String pc = paths.get(0);
+            System.out.println("debg >> " + pc);
             final String path = FileUtil.path(pc);
+            System.out.println("debg >> " + path);
             final String name = FileUtil.name(pc);
+            System.out.println("debg >> " + name);
             if (name == null) {
                 return Mono.error(new ParameterException(
                         this.getClass(),

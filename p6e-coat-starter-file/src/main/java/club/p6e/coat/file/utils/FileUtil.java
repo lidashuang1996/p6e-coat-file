@@ -561,12 +561,11 @@ public final class FileUtil {
     @SuppressWarnings("ALL")
     public static String path(String content) {
         content = content
-                .replaceAll(FILE_CONNECT_CHAR + FILE_CONNECT_CHAR + PATH_CONNECT_CHAR, "")
-                .replaceAll(FILE_CONNECT_CHAR + FILE_CONNECT_CHAR + PATH_OPPOSE_CONNECT_CHAR, "")
-                .replaceAll(FILE_CONNECT_CHAR + PATH_CONNECT_CHAR, "")
-                .replaceAll(FILE_CONNECT_CHAR + PATH_OPPOSE_CONNECT_CHAR, "")
-                .replaceAll(PATH_CONNECT_CHAR + PATH_CONNECT_CHAR, "")
-                .replaceAll(PATH_OPPOSE_CONNECT_CHAR + PATH_OPPOSE_CONNECT_CHAR, "");
+                .replaceAll("\\.\\./", "")
+                .replaceAll("\\.\\.\\\\", "")
+                .replaceAll("\\./", "")
+                .replaceAll("\\.\\\\", "")
+                .replaceAll("\\\\\\\\", "");
         boolean bool = (name(content) == null);
         final StringBuilder sb = new StringBuilder();
         for (int j = content.length() - 1; j >= 0; j--) {

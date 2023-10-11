@@ -2,14 +2,17 @@ package club.p6e.coat.file.repository;
 
 import club.p6e.coat.file.error.DataBaseException;
 import club.p6e.coat.file.model.UploadChunkModel;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Statement;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 文件块上传存储库
@@ -32,19 +35,18 @@ public class UploadChunkRepository {
     @SuppressWarnings("ALL")
     private static final String CREATE_SQL = "" +
             "  INSERT INTO p6e_file_upload_chunk  " +
-            "  (id, fid, name, size, date, operator)  " +
-            "  VALUES($id, $fid, $name, $size, $date, $operator);";
+            "  (fid, name, size, date, operator)  " +
+            "  VALUES( $1, $2, $3, $4, $5) RETURNING id;";
 
     @SuppressWarnings("ALL")
     private static final String DELETE_SQL = "" +
-            "DELETE FROM p6e_file_upload_chunk WHERE fid = $fid;";
+            "DELETE FROM p6e_file_upload_chunk WHERE fid = $1;";
 
 
     /**
      * 构造方法初始化
-     *
      */
-    public UploadChunkRepository(@Qualifier("club.p6e.coat.file.config.ConnectionFactory") ConnectionFactory factory) {
+    public UploadChunkRepository(ConnectionFactory factory) {
         this.factory = factory;
     }
 
@@ -67,21 +69,24 @@ public class UploadChunkRepository {
         if (model.getOperator() == null) {
             model.setOperator("sys");
         }
-        return Mono
-                .from(this.factory.create())
-                .flatMap(connection -> {
-                    final Statement statement = connection.createStatement(CREATE_SQL);
-                    statement.bindNull("$id", Integer.class);
-                    statement.bind("$fid", model.getFid());
-                    statement.bind("$name", model.getName());
-                    statement.bind("$size", model.getSize());
-                    statement.bind("$date", model.getDate());
-                    statement.bind("$operator", model.getOperator());
-                    return Mono.from(statement.execute());
-                })
-                .flatMap(r -> Mono.from(r.map((row, metadata) -> row.get("id", Integer.class))))
+        System.out.println(" >>>>>>>>>>>>>>>>>           " + model);
+        return Mono.usingWhen(
+                        this.factory.create(),
+                        connection -> {
+                            final Statement statement = connection.createStatement(CREATE_SQL);
+                            statement.bind("$1", model.getFid());
+                            statement.bind("$2", model.getName());
+                            statement.bind("$3", model.getSize());
+                            statement.bind("$4", model.getDate());
+                            statement.bind("$5", model.getOperator());
+                            return Mono.from(statement.execute())
+                                    .flatMap(r -> Mono.from(r.map((row, metadata) -> row.get("id", Integer.class))));
+                        },
+                        Connection::close
+                )
                 .flatMap(id -> {
                     model.setId(id);
+                    System.out.println("CHUNK 最新模块是  " + model);
                     return Mono.just(model);
                 });
     }
@@ -99,4 +104,33 @@ public class UploadChunkRepository {
                 .flatMap(r -> Mono.from(r.getRowsUpdated()));
     }
 
+    @SuppressWarnings("ALL")
+    private static final String SELECT_SQL = "" +
+            "  SELECT  " +
+            "    id, fid, name, size, date, operator  " +
+            "  FROM p6e_file_upload_chunk  " +
+            "  WHERE  " +
+            "  id > $id date < $localDateTime" +
+            "  ORDER BY id AES;";
+
+    public Mono<UploadChunkModel> select(Integer id, LocalDateTime localDateTime) {
+        return Mono
+                .from(this.factory.create())
+                .flatMap(connection -> {
+                    final Statement statement = connection.createStatement(SELECT_SQL);
+                    statement.bind("$id", id);
+                    statement.bind("$localDateTime", localDateTime);
+                    return Mono.from(statement.execute());
+                })
+                .flatMap(r -> Mono.from(r.map((row, metadata) -> {
+                    final UploadChunkModel model = new UploadChunkModel();
+                    model.setId(row.get("id", Integer.class));
+                    model.setFid(row.get("fid", Integer.class));
+                    model.setName(row.get("name", String.class));
+                    model.setSize(row.get("size", Long.class));
+                    model.setDate(row.get("date", LocalDateTime.class));
+                    model.setOperator(row.get("operator", String.class));
+                    return model;
+                })));
+    }
 }

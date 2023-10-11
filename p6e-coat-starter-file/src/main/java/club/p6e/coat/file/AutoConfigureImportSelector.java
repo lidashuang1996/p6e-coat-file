@@ -1,5 +1,7 @@
 package club.p6e.coat.file;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -22,6 +24,11 @@ import java.util.List;
  * @version 1.0
  */
 public class AutoConfigureImportSelector implements ImportSelector {
+
+    /**
+     * 注入日志对象
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AutoConfigureImportSelector.class);
 
     /**
      * 扫描包下面的路径
@@ -54,7 +61,7 @@ public class AutoConfigureImportSelector implements ImportSelector {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage(), e);
         }
         return register.toArray(new String[0]);
     }

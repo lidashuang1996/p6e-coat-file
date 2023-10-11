@@ -2,13 +2,36 @@ server:
   port: 8080
 
 spring:
-  r2dbc:
-    url: r2dbc:pool:postgres://ip:5432/db_name
-    username: postgres
-    password: ''
+  application:
+    name: 'p6e-coat-file'
+  config:
+    import: D://env/p6e-coat-file-application.yml
   servlet:
     multipart:
-      max-request-size: 15MB
-      max-file-size: 12MB
+      max-request-size: 25MB
+      max-file-size: 22MB
 logging:
   config: 'classpath:p6e-coat-logback.xml'
+
+
+p6e:
+  coat:
+    file:
+      uploads:
+        test:
+          type: 'DISK'
+          path: D://env/d
+      downloads:
+        test:
+          type: 'DISK'
+          path: D://env/d
+      resources:
+        test:
+          type: 'DISK'
+          path: D://env/d
+          suffixes:
+            png: 'image/png'
+            jpg: 'image/jpeg'
+            mp4: 'video/mp4'
+      slice-upload:
+        path: D://env/su

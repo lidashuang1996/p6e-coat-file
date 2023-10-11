@@ -1,5 +1,6 @@
 package club.p6e.coat.file.aspect;
 
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,16 @@ public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
 
     @Override
     public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
+        final Object id = result.get("id");
+        final Object size = result.get("size");
+        final String name = String.valueOf(result.get("name"));
+        final String storage = String.valueOf(result.get("storageLocation"));
+        final String path = FileUtil.composePath(storage, name);
+        result.clear();
+        result.put("id", id);
+        result.put("size", size);
+        result.put("name", name);
+        result.put("path", path);
         return Mono.just(true);
     }
 

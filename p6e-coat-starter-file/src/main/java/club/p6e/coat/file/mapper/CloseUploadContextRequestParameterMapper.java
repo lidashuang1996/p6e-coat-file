@@ -28,6 +28,11 @@ import java.util.List;
 public class CloseUploadContextRequestParameterMapper extends RequestParameterMapper {
 
     /**
+     * NODE 请求参数
+     */
+    private static final String NODE_PARAMETER_NAME = "node";
+
+    /**
      * URL ID 请求参数
      */
     private static final String URL_PARAMETER_ID = "id";
@@ -63,6 +68,12 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
         final ServerHttpRequest httpRequest = request.exchange().getRequest();
         final MultiValueMap<String, String> queryParams = httpRequest.getQueryParams();
         context.putAll(queryParams);
+        if (queryParams.get("node") != null && !queryParams.get("node").isEmpty()) {
+            System.out.println(
+                    queryParams.get("node").get(0)
+            );
+            context.setNode(queryParams.get("node").get(0));
+        }
         final List<PathContainer.Element> elements = request.requestPath().elements();
         final String requestPathFinishContent = elements.get(elements.size() - 1).value();
         // 如果不是请求后缀标记
@@ -78,11 +89,12 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                         "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
                 ));
             }
+            System.out.println("MAPPER CONTENT + c  " + context.toMap());
             return Mono.just(context);
         } else {
             // 读取 URL ID 请求参数
             final List<String> ids = queryParams.get(URL_PARAMETER_ID);
-            if (ids != null && ids.size() > 0) {
+            if (ids != null && !ids.isEmpty()) {
                 try {
                     // 如果读取到了 URL ID 那么就写入到上下文对象中
                     context.setId(Integer.valueOf(ids.get(0)));

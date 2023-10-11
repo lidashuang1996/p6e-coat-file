@@ -1,6 +1,7 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.file.FileReadWriteService;
+import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.service.CloseUploadService;
 import club.p6e.coat.file.context.CloseUploadContext;
 import club.p6e.coat.file.Properties;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -28,21 +30,32 @@ import java.util.Map;
 public class CloseUploadServiceImpl implements CloseUploadService {
 
     /**
+     * 配置文件对象
+     */
+    private final Properties properties;
+
+    /**
      * 上传存储库对象
      */
     private final UploadRepository repository;
 
-    private final Properties properties;
-
+    /**
+     * 文件读写服务对象
+     */
     private final FileReadWriteService fileReadWriteService;
 
     /**
      * 构造方法初始化
      *
-     * @param properties 配置文件对象
-     * @param repository 上传存储库对象
+     * @param properties           配置文件对象
+     * @param repository           上传存储库对象
+     * @param fileReadWriteService 文件读写服务对象
      */
-    public CloseUploadServiceImpl(Properties properties, FileReadWriteService fileReadWriteService, UploadRepository repository) {
+    public CloseUploadServiceImpl(
+            Properties properties,
+            UploadRepository repository,
+            FileReadWriteService fileReadWriteService
+    ) {
         this.fileReadWriteService = fileReadWriteService;
         this.repository = repository;
         this.properties = properties;
@@ -54,6 +67,7 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                 .closeLock(context.getId())
                 .flatMap(l -> repository.findById(context.getId()))
                 .flatMap(m -> {
+                    System.out.println(">>> context >> " + context.toMap());
                     final Object operator = context.get("operator");
                     if (operator instanceof final String content) {
                         m.setOperator(content);
@@ -74,15 +88,18 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                             }
                         }
                     }
+                    System.out.println("文件合并的顺序是: " + Arrays.toString(files));
                     return fileReadWriteService
-                            .write(m.getName(), m.toMap(), file -> FileUtil.mergeFileSlice(files, file))
+                            .write(m.getName(), context.toMap(), file -> FileUtil.mergeFileSlice(files, file))
                             .flatMap(fm -> repository
-                                    .update(m
+                                    .update(new UploadModel()
+                                            .setId(m.getId())
                                             .setSize(fm.getLength())
                                             .setStorageType(fm.getType())
                                             .setStorageLocation(fm.getPath())
                                     ))
-                            .map(l -> m.toMap());
+                            .flatMap(l -> repository.findById(m.getId()))
+                            .map(UploadModel::toMap);
                 });
     }
 

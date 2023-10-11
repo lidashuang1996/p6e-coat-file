@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.sql.SQLOutput;
 import java.util.Map;
 
 /**
@@ -55,6 +56,11 @@ public class SliceUploadServiceImpl implements SliceUploadService {
     private final UploadChunkRepository uploadChunkRepository;
 
     /**
+     * 文件签名服务
+     */
+    private final FileSignatureService fileSignatureService;
+
+    /**
      * 构造方法初始化
      *
      * @param properties            配置文件对象
@@ -64,15 +70,18 @@ public class SliceUploadServiceImpl implements SliceUploadService {
     public SliceUploadServiceImpl(
             Properties properties,
             UploadRepository uploadRepository,
-            UploadChunkRepository uploadChunkRepository
+            UploadChunkRepository uploadChunkRepository,
+            FileSignatureService fileSignatureService
     ) {
         this.properties = properties;
         this.uploadRepository = uploadRepository;
         this.uploadChunkRepository = uploadChunkRepository;
+        this.fileSignatureService = fileSignatureService;
     }
 
     @Override
     public Mono<Map<String, Object>> execute(SliceUploadContext context) {
+        System.out.println("========================KAIshi========================");
         final Integer id = context.getId();
         final Integer index = context.getIndex();
         final String signature = context.getSignature();
@@ -93,6 +102,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                             }
                             final File absolutePathFile = new File(
                                     FileUtil.composePath(absolutePath, index + "_" + FileUtil.generateName()));
+                            System.out.println("p6e_file_upload      " + absolutePathFile);
                             return repository
                                     // 获取锁
                                     .acquireLock(um.getId())
@@ -101,11 +111,12 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                                     // 释放锁
                                     .flatMap(file -> repository.releaseLock(um.getId()))
                                     // 转换为文件对象输出
-                                    .map(c -> absolutePathFile);
+                                    .map(l -> absolutePathFile);
                         })
                         // 验证文件数据
                         .flatMap(f -> {
                             final long size = properties.getSliceUpload().getMaxSize();
+                            System.out.println("p6e_file_upload      " + size);
                             if (f.length() > size) {
                                 FileUtil.deleteFile(f);
                                 return Mono.error(new FileException(this.getClass(),
@@ -114,10 +125,10 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                                         "File (" + f.getName() + ") upload exceeds the maximum length limit")
                                 );
                             }
+                            System.out.println("通过大小检测");
                             return Mono.just(f);
                         })
-                        .flatMap(f -> SpringUtil
-                                .getBean(FileSignatureService.class)
+                        .flatMap(f -> fileSignatureService
                                 .execute(f)
                                 .flatMap(s -> {
                                     LOGGER.info("[" + f.getAbsolutePath() + "] " +
@@ -130,9 +141,11 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                                                 "File (" + f.getName() + ") incorrect signature content")
                                         );
                                     }
+                                    System.out.println("签名认证成功");
                                     return Mono.just(f);
                                 }))
                         .flatMap(f -> {
+                            System.out.println("开始保存数据");
                             final UploadChunkModel model = new UploadChunkModel();
                             model.setFid(m.getId());
                             model.setName(f.getName());
@@ -143,6 +156,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                             } else if (m.getOperator() != null) {
                                 model.setOperator(m.getOperator());
                             }
+                            System.out.println("--------------------craeete -- chunk--------------");
                             return uploadChunkRepository.create(model);
                         })
                 )

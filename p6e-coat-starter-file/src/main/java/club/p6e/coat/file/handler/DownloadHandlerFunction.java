@@ -5,8 +5,6 @@ import club.p6e.coat.file.context.DownloadContext;
 import club.p6e.coat.file.error.FileException;
 import club.p6e.coat.file.mapper.RequestParameterMapper;
 import club.p6e.coat.file.service.DownloadService;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
@@ -19,8 +17,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.Serializable;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -67,12 +63,14 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                 RequestParameterMapper.execute(request, DownloadContext.class)
                         // 执行下载操作之前的切点
                         .flatMap(c -> before(aspect, c.toMap()))
-                        .flatMap(m -> service.execute(new DownloadContext(m)))
+                        .flatMap(m -> service
+                                .execute(new DownloadContext(m))
+                                .flatMap(fra -> after(aspect, m, null).map(b -> fra)))
                         .flatMap(fra -> {
                             final String fc;
                             final List<HttpRange> ranges = request.headers().range();
                             try {
-                                fc = URLEncoder.encode(fra.name(), StandardCharsets.UTF_8);
+                                fc = URLEncoder.encode(fra.model().getName(), StandardCharsets.UTF_8);
                             } catch (Exception e) {
                                 // 忽略异常
                                 return Mono.error(new FileException(
@@ -83,16 +81,17 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                                 ));
                             }
                             if (!ranges.isEmpty()) {
+                                final long length = fra.model().getLength();
                                 final HttpRange range = ranges.get(0);
-                                final long el = range.getRangeEnd(fra.length());
-                                final long sl = range.getRangeStart(fra.length());
+                                final long el = range.getRangeEnd(length);
+                                final long sl = range.getRangeStart(length);
                                 final long cl = el - sl + 1;
                                 return ServerResponse
                                         .status(HttpStatus.PARTIAL_CONTENT)
                                         .contentLength(cl)
                                         .contentType(MediaType.APPLICATION_OCTET_STREAM)
                                         .header(HttpHeaders.ACCEPT_RANGES, "bytes")
-                                        .header(HttpHeaders.CONTENT_RANGE, "bytes " + sl + "-" + el + "/" + fra.length())
+                                        .header(HttpHeaders.CONTENT_RANGE, "bytes " + sl + "-" + el + "/" + length)
                                         .header("Content-Disposition", "attachment; filename=" + fc)
                                         .body((response, context) -> response.writeWith(fra.execute(sl, cl)));
                             } else {

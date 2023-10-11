@@ -3,9 +3,9 @@ package club.p6e.coat.file.repository;
 import club.p6e.coat.file.error.DataBaseException;
 import club.p6e.coat.file.error.FileException;
 import club.p6e.coat.file.model.UploadModel;
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Statement;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -42,9 +42,9 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String CREATE_SQL = "" +
-            "  INSERT INTO p6e_file_upload_chunk  " +
-            "  (id, name, size, source, storage_type, storage_location, owner, create_date, update_date, rubbish, operator, lock, version)  " +
-            "  VALUES($id, $name, $size, $source, $storage_type, $storage_location, $owner, $create_date, $update_date, $rubbish, $operator, $lock, $version);";
+            "  INSERT INTO p6e_file_upload  " +
+            "  (name, size, source, storage_type, storage_location, owner, create_date, update_date, operator, lock, version)  " +
+            "  VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id;";
 
     /**
      * 创建数据
@@ -69,36 +69,36 @@ public class UploadRepository {
         if (model.getOperator() == null) {
             model.setOperator("sys");
         }
+        if (model.getStorageType() == null) {
+            model.setStorageType("");
+        }
+        if (model.getStorageLocation() == null) {
+            model.setStorageLocation("");
+        }
         model.setId(null);
         model.setLock(0);
         model.setVersion(0);
-        model.setRubbish(0);
         model.setCreateDate(LocalDateTime.now());
         model.setUpdateDate(LocalDateTime.now());
         return Mono
                 .from(this.factory.create())
                 .flatMap(connection -> {
                     final Statement statement = connection.createStatement(CREATE_SQL);
-                    statement.bindNull("$id", Integer.class);
-                    statement.bind("$name", model.getName());
-                    statement.bind("$size", model.getSize());
-                    statement.bind("$source", model.getSource());
-                    statement.bind("$storage_type", model.getStorageType());
-                    statement.bind("$storage_location", model.getStorageLocation());
-                    statement.bind("$owner", model.getOwner());
-                    statement.bind("$create_date", model.getCreateDate());
-                    statement.bind("$update_date", model.getUpdateDate());
-                    statement.bind("$rubbish", model.getRubbish());
-                    statement.bind("$operator", model.getOperator());
-                    statement.bind("$lock", model.getLock());
-                    statement.bind("$version", model.getVersion());
+                    statement.bind("$1", model.getName());
+                    statement.bind("$2", model.getSize());
+                    statement.bind("$3", model.getSource());
+                    statement.bind("$4", model.getStorageType());
+                    statement.bind("$5", model.getStorageLocation());
+                    statement.bind("$6", model.getOwner());
+                    statement.bind("$7", model.getCreateDate());
+                    statement.bind("$8", model.getUpdateDate());
+                    statement.bind("$9", model.getOperator());
+                    statement.bind("$10", model.getLock());
+                    statement.bind("$11", model.getVersion());
                     return Mono.from(statement.execute());
                 })
                 .flatMap(r -> Mono.from(r.map((row, metadata) -> row.get("id", Integer.class))))
-                .flatMap(id -> {
-                    model.setId(id);
-                    return Mono.just(model);
-                });
+                .flatMap(this::findById);
     }
 
     /**
@@ -108,11 +108,12 @@ public class UploadRepository {
      * @return Mono<Long> 受影响的数据条数
      */
     public Mono<Long> acquireLock(int id) {
+        System.out.println("acquireLock");
         return acquireLock(id, 0);
     }
 
     private static final int MAX_RETRY_COUNT = 3;
-    private static final int RETRY_INTERVAL_DATE = 1500;
+    private static final int RETRY_INTERVAL_DATE = 1000;
 
     /**
      * 修改数据--锁增加 1
@@ -142,9 +143,9 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String ACQUIRE_LOCK_SQL = "" +
-            "  UPDATE p6e_file_upload_chunk  " +
-            "  SET lock = $lock, version = $version1, update_date = $update_date " +
-            "  WHERE id = $id AND version = $version2;";
+            "  UPDATE p6e_file_upload  " +
+            "  SET lock = $1, version = $2, update_date = $3 " +
+            "  WHERE id = $4 AND version = $5;";
 
     /**
      * 修改数据--锁增加 1
@@ -155,19 +156,24 @@ public class UploadRepository {
     private Mono<Long> acquireLock0(int id) {
         return this.findById(id)
                 .flatMap(m -> {
+                    System.out.println("ACQ ACQ   " + m);
+                    m.setUpdateDate(LocalDateTime.now());
                     if (m.getLock() >= 0) {
-                        return Mono
-                                .from(this.factory.create())
-                                .flatMap(connection -> {
+                        return Mono.usingWhen(
+                                this.factory.create(),
+                                connection -> {
                                     final Statement statement = connection.createStatement(ACQUIRE_LOCK_SQL);
-                                    statement.bind("$id", id);
-                                    statement.bind("$lock", m.getLock() + 1);
-                                    statement.bind("$version1", m.getVersion() + 1);
-                                    statement.bind("$version2", m.getVersion());
-                                    statement.bind("$update_date", m.getUpdateDate());
-                                    return Mono.from(statement.execute());
-                                })
-                                .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                    statement.bind("$1", m.getLock() + 1);
+                                    statement.bind("$2", m.getVersion() + 1);
+                                    statement.bind("$3", m.getUpdateDate());
+                                    statement.bind("$4", m.getId());
+                                    statement.bind("$5", m.getVersion());
+                                    return Mono
+                                            .from(statement.execute())
+                                            .flatMap(result -> Mono.from(result.getRowsUpdated()));
+                                },
+                                Connection::close
+                        );
                     } else {
                         return Mono.error(new FileException(
                                 this.getClass(),
@@ -185,6 +191,7 @@ public class UploadRepository {
      * @return Mono<Long> 受影响的数据条数
      */
     public Mono<Long> releaseLock(int id) {
+        System.out.println("releaseLock");
         return releaseLock(id, 0);
     }
 
@@ -215,9 +222,9 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String RELEASE_LOCK_SQL = "" +
-            "  UPDATE p6e_file_upload_chunk  " +
-            "  SET lock = $lock, version = $version1, update_date = $update_date " +
-            "  WHERE id = $id AND version = $version2;";
+            "  UPDATE p6e_file_upload  " +
+            "  SET lock = $1, version = $2, update_date = $3 " +
+            "  WHERE id = $4 AND version = $5;";
 
     /**
      * 修改数据--锁减少 1
@@ -228,19 +235,23 @@ public class UploadRepository {
     private Mono<Long> releaseLock0(int id) {
         return this.findById(id)
                 .flatMap(m -> {
+                    m.setUpdateDate(LocalDateTime.now());
+                    System.out.println("RES RES   " + m);
                     if (m.getLock() >= 0) {
-                        return Mono
-                                .from(this.factory.create())
-                                .flatMap(connection -> {
+                        return Mono.usingWhen(
+                                this.factory.create(),
+                                connection -> {
                                     final Statement statement = connection.createStatement(RELEASE_LOCK_SQL);
-                                    statement.bind("$id", id);
-                                    statement.bind("$lock", m.getLock() - 1);
-                                    statement.bind("$version1", m.getVersion() + 1);
-                                    statement.bind("$version2", m.getVersion());
-                                    statement.bind("$update_date", m.getUpdateDate());
-                                    return Mono.from(statement.execute());
-                                })
-                                .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                    statement.bind("$1", m.getLock() - 1);
+                                    statement.bind("$2", m.getVersion() + 1);
+                                    statement.bind("$3", m.getUpdateDate());
+                                    statement.bind("$4", id);
+                                    statement.bind("$5", m.getVersion());
+                                    return Mono.from(statement.execute())
+                                            .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                },
+                                Connection::close
+                        );
                     } else {
                         return Mono.error(new FileException(
                                 this.getClass(),
@@ -258,7 +269,11 @@ public class UploadRepository {
      * @return Mono<UploadModel> 受影响的数据条数
      */
     public Mono<Long> closeLock(int id) {
-        return closeLock(id, 0);
+        System.out.println(id);
+        return closeLock(id, 0).flatMap(r -> findById(id).map(m -> {
+            System.out.println(m);
+            return 1L;
+        }));
     }
 
     /**
@@ -288,9 +303,9 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String CLOSE_LOCK_SQL = "" +
-            "  UPDATE p6e_file_upload_chunk  " +
-            "  SET lock = $lock, version = $version1, update_date = $update_date " +
-            "  WHERE id = $id AND version = $version2;";
+            "  UPDATE p6e_file_upload  " +
+            "  SET lock = $1, version = $2, update_date = $3 " +
+            "  WHERE id = $4 AND version = $5;";
 
     /**
      * 关闭锁
@@ -301,6 +316,7 @@ public class UploadRepository {
     private Mono<Long> closeLock0(int id) {
         return this.findById(id)
                 .flatMap(m -> {
+                    m.setUpdateDate(LocalDateTime.now());
                     if (m.getLock() == -1) {
                         return Mono.error(new FileException(
                                 this.getClass(),
@@ -314,18 +330,20 @@ public class UploadRepository {
                                 "There are upload sharding requests and cannot be closed"
                         ));
                     } else if (m.getLock() == 0) {
-                        return Mono
-                                .from(this.factory.create())
-                                .flatMap(connection -> {
+                        return Mono.usingWhen(
+                                this.factory.create(),
+                                connection -> {
                                     final Statement statement = connection.createStatement(CLOSE_LOCK_SQL);
-                                    statement.bind("$id", id);
-                                    statement.bind("$lock", -1);
-                                    statement.bind("$version1", m.getVersion() + 1);
-                                    statement.bind("$version2", m.getVersion());
-                                    statement.bind("$update_date", m.getUpdateDate());
-                                    return Mono.from(statement.execute());
-                                })
-                                .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                    statement.bind("$1", -1);
+                                    statement.bind("$2", m.getVersion() + 1);
+                                    statement.bind("$3", m.getUpdateDate());
+                                    statement.bind("$4", id);
+                                    statement.bind("$5", m.getVersion());
+                                    return Mono.from(statement.execute())
+                                            .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                },
+                                Connection::close
+                        );
                     } else {
                         return Mono.just(0L);
                     }
@@ -334,9 +352,9 @@ public class UploadRepository {
 
     @SuppressWarnings("all")
     private static final String SELECT_SQL = "" +
-            "  SELECT id, name, size, source, storage_type, storage_location, owner, create_date, update_date, rubbish, operator, lock, version  " +
-            "  FROM p6e_file_upload_chunk  " +
-            "  WHERE id = $id;";
+            "  SELECT id, name, size, source, storage_type, storage_location, owner, create_date, update_date, operator, lock, version  " +
+            "  FROM p6e_file_upload  " +
+            "  WHERE id = $1;";
 
     /**
      * 根据 ID 查询数据
@@ -345,39 +363,40 @@ public class UploadRepository {
      * @return Mono<UploadModel> 模型对象
      */
     public Mono<UploadModel> findById(int id) {
-        return Mono
-                .from(this.factory.create())
-                .flatMap(connection -> Mono.from(connection.createStatement(SELECT_SQL).bind("$id", id).execute()))
-                .flatMap(r -> Mono.from(r.map((row, metadata) -> {
-                    final UploadModel model = new UploadModel();
-                    model.setId(row.get("id", Integer.class));
-                    model.setName(row.get("name", String.class));
-                    model.setSize(row.get("size", Long.class));
-                    model.setSource(row.get("source", String.class));
-                    model.setStorageType(row.get("storage_type", String.class));
-                    model.setStorageLocation(row.get("storage_location", String.class));
-                    model.setOwner(row.get("owner", String.class));
-                    model.setCreateDate(row.get("create_date", LocalDateTime.class));
-                    model.setUpdateDate(row.get("update_date", LocalDateTime.class));
-                    model.setRubbish(row.get("rubbish", Integer.class));
-                    model.setOperator(row.get("operator", String.class));
-                    model.setLock(row.get("lock", Integer.class));
-                    model.setVersion(row.get("version", Integer.class));
-                    return model;
-                })));
+        return Mono.usingWhen(
+                this.factory.create(),
+                connection -> Mono.from(connection.createStatement(SELECT_SQL).bind("$1", id).execute())
+                        .flatMap(r -> Mono.from(r.map((row, metadata) -> {
+                            final UploadModel model = new UploadModel();
+                            model.setLock(row.get("lock", Integer.class));
+                            model.setVersion(row.get("version", Integer.class));
+                            model.setId(row.get("id", Integer.class));
+                            model.setOwner(row.get("owner", String.class));
+                            model.setCreateDate(row.get("create_date", LocalDateTime.class));
+                            model.setUpdateDate(row.get("update_date", LocalDateTime.class));
+                            model.setOperator(row.get("operator", String.class));
+                            model.setName(row.get("name", String.class));
+                            model.setSize(row.get("size", Long.class));
+                            model.setSource(row.get("source", String.class));
+                            model.setStorageType(row.get("storage_type", String.class));
+                            model.setStorageLocation(row.get("storage_location", String.class));
+                            return model;
+                        })))
+                , Connection::close
+        );
     }
 
     @SuppressWarnings("ALL")
     private static final String SELELCT_SQL2 = "" +
             "  SELECT id, name, size, source, storage_type, storage_location, owner, create_date, update_date, rubbish, operator, lock, version  " +
-            "  FROM p6e_file_upload_chunk  " +
+            "  FROM p6e_file_upload  " +
             "  WHERE id > $id AND create_date >= $localDateTime" +
             "  ORDER BY id AES ;";
 
     /**
      * 根据 ID 或者创建时间范围查询数据
      *
-     * @param id        模型 ID
+     * @param id 模型 ID
      * @return Mono<UploadModel> 模型对象
      */
     public Mono<UploadModel> findByIdAndCreateDateOne(int id, LocalDateTime localDateTime) {
@@ -397,7 +416,6 @@ public class UploadRepository {
                     model.setOwner(row.get("owner", String.class));
                     model.setCreateDate(row.get("create_date", LocalDateTime.class));
                     model.setUpdateDate(row.get("update_date", LocalDateTime.class));
-                    model.setRubbish(row.get("rubbish", Integer.class));
                     model.setOperator(row.get("operator", String.class));
                     model.setName(row.get("name", String.class));
                     model.setSize(row.get("size", Long.class));
@@ -410,10 +428,9 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String UPDATE_SQL = "" +
-            "  SELECT id, name, size, source, storage_type, storage_location, owner, create_date, update_date, rubbish, operator, lock, version  " +
-            "  FROM p6e_file_upload_chunk  " +
-            "  WHERE id > $id AND create_date >= $localDateTime" +
-            "  ORDER BY id AES ;";
+            "  UPDATE p6e_file_upload  " +
+            "  SET  aaa " +
+            "  WHERE id = $1 AND version = $2;";
 
     /**
      * 修改数据
@@ -424,28 +441,48 @@ public class UploadRepository {
     public Mono<Long> update(UploadModel model) {
         return this.findById(model.getId())
                 .flatMap(m -> {
-                    return Mono
-                            .from(this.factory.create())
-                            .flatMap(connection -> {
-                                final Statement statement = connection.createStatement(UPDATE_SQL);
-                                statement.bind("$id", model.getId());
-                                statement.bind("$name", model.getName());
-                                statement.bind("$size", model.getSize());
-                                statement.bind("$source", model.getSource());
-                                statement.bind("$storage_type", model.getStorageType());
-                                statement.bind("$storage_location", model.getStorageLocation());
-                                statement.bind("$owner", model.getOwner());
-                                statement.bind("$create_date", model.getCreateDate());
-                                statement.bind("$update_date", model.getUpdateDate());
-                                statement.bind("$rubbish", model.getRubbish());
-                                statement.bind("$operator", model.getOperator());
-                                statement.bind("$lock", model.getLock());
-                                statement.bind("$version", model.getVersion() + 1);
-                                return Mono.from(statement.execute());
-                            })
-                            .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                    model.setVersion(m.getVersion());
+                    model.setUpdateDate(LocalDateTime.now());
+                    System.out.println("xxx update   " + model);
+                    return Mono.usingWhen(
+                            this.factory.create(),
+                            connection -> {
+                                String sql = UPDATE_SQL;
+                                String a = "";
+                                if (model.getVersion() != null) {
+                                    a += ", version = $3 ";
+                                }
+                                if (model.getUpdateDate() != null) {
+                                    a += ", update_date = $4 ";
+                                }
+                                if (model.getSize() != null) {
+                                    a += ", size = $5 ";
+                                }
+                                if (model.getStorageType() != null) {
+                                    a += ", storage_type = $6 ";
+                                }
+                                if (model.getStorageLocation() != null) {
+                                    a += ", storage_location = $7 ";
+                                }
+                                System.out.println(a);
+                                System.out.println(a.substring(1));
+                                System.out.println(sql);
+                                sql = sql.replace("aaa", a.substring(1));
+                                System.out.println(sql);
+                                final Statement statement = connection.createStatement(sql);
+                                statement.bind("$4", model.getUpdateDate());
+                                statement.bind("$5", model.getSize());
+                                statement.bind("$6", model.getStorageType());
+                                statement.bind("$7", model.getStorageLocation());
+                                statement.bind("$1", model.getId());
+                                statement.bind("$2", model.getVersion());
+                                statement.bind("$3", model.getVersion() + 1);
+                                return Mono.from(statement.execute())
+                                        .flatMap(r -> Mono.from(r.getRowsUpdated()));
+                            },
+                            Connection::close
+                    );
                 });
-
     }
 
     @SuppressWarnings("ALL")

@@ -18,21 +18,6 @@ import java.util.Map;
 @Accessors(chain = true)
 public class UploadModel implements Serializable {
 
-    public static final String TABLE = "p6e_file_upload";
-
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String SIZE = "size";
-    public static final String SOURCE = "source";
-    public static final String OWNER = "owner";
-    public static final String STORAGE_LOCATION = "storageLocation";
-    public static final String CREATE_DATE = "createDate";
-    public static final String UPDATE_DATE = "updateDate";
-    public static final String OPERATOR = "operator";
-    public static final String LOCK = "lock";
-    public static final String VERSION = "version";
-    public static final String RUBBISH = "rubbish";
-
     private Integer id;
     private String name;
     private Long size;
@@ -45,7 +30,6 @@ public class UploadModel implements Serializable {
     private String operator;
     private Integer lock;
     private Integer version;
-    private Integer rubbish;
 
     public Map<String, Object> toMap() {
         final Map<String, Object> map = new HashMap<>(10);
@@ -53,6 +37,7 @@ public class UploadModel implements Serializable {
         map.put("name", name);
         map.put("size", size);
         map.put("source", source);
+        map.put("storageType", storageType);
         map.put("storageLocation", storageLocation);
         map.put("owner", owner);
         map.put("createDate", createDate);
@@ -60,7 +45,6 @@ public class UploadModel implements Serializable {
         map.put("operator", operator);
         map.put("lock", lock);
         map.put("version", version);
-        map.put("rubbish", rubbish);
         return map;
     }
 

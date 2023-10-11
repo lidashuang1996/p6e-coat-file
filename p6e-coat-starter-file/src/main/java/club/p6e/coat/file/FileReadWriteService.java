@@ -1,16 +1,11 @@
 package club.p6e.coat.file;
 
-import lombok.Data;
-import org.springframework.core.io.buffer.DataBuffer;
+import club.p6e.coat.file.actuator.FileActuatorModel;
+import club.p6e.coat.file.actuator.FileReadActuator;
+import club.p6e.coat.file.actuator.FileWriteActuator;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.File;
-import java.io.Serializable;
-import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -19,31 +14,28 @@ import java.util.Map;
  */
 public interface FileReadWriteService {
 
-    @Data
-    public static class FileModel implements Serializable {
-        private String name;
-        private String path;
-        private String type;
-        private long length;
-    }
+    /**
+     * 写入文件
+     *
+     * @param name              文件名称
+     * @param extend            扩展参数
+     * @param fileWriteActuator 文件写入执行器对象
+     * @return 文件模型对象
+     */
+    public Mono<FileActuatorModel> write(
+            String name, Map<String, Object> extend, FileWriteActuator fileWriteActuator);
 
-    public interface FileWriteActuator {
-        Mono<File> execute(File file);
-    }
-
-    public interface FileReadActuator {
-        String name();
-
-        MediaType mediaType();
-        long length();
-        Flux<DataBuffer> execute();
-
-        Flux<DataBuffer> execute(long position, long size);
-    }
-
-    public Mono<FileModel> write(String name, Map<String, Object> extend, FileWriteActuator fileWriteActuator);
-
-    public Mono<FileReadActuator> read(String type, String base, String path, MediaType mediaType, Map<String, Object> extend);
-
+    /**
+     * 读取文件
+     *
+     * @param type      资源类型
+     * @param base      基础路径
+     * @param path      文件路径
+     * @param mediaType 媒体类型
+     * @param extend    扩展参数
+     * @return 文件读取执行器对象
+     */
+    public Mono<FileReadActuator> read(
+            String type, String base, String path, MediaType mediaType, Map<String, Object> extend);
 
 }

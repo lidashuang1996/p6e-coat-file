@@ -54,7 +54,7 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
         context.putAll(queryParams);
         // 读取 URL 文件名称请求参数
         final List<String> names = queryParams.get(URL_PARAMETER_NAME);
-        if (names != null && names.size() > 0) {
+        if (names != null && !names.isEmpty()) {
             // 如果读取到了 URL 文件名称请求参数那么就写入到上下文对象中
             final String name = FileUtil.name(names.get(0));
             if (name == null) {
@@ -101,7 +101,7 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
                         .flatMap(m -> {
                             final OpenUploadContext newContext = new OpenUploadContext(m);
                             final Object fdName = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_NAME);
-                            if (fdName instanceof final List<?> ol && ol.size() > 0
+                            if (fdName instanceof final List<?> ol && !ol.isEmpty()
                                     && ol.get(0) instanceof final String content) {
                                 final String name = FileUtil.name(content);
                                 if (name == null) {

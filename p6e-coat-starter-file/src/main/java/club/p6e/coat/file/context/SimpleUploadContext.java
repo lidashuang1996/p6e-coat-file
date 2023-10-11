@@ -16,6 +16,8 @@ import java.util.Map;
 @Getter
 public class SimpleUploadContext extends HashMap<String, Object> implements Serializable {
 
+    private String node;
+
     /**
      * 文件对象
      */
@@ -42,10 +44,17 @@ public class SimpleUploadContext extends HashMap<String, Object> implements Seri
     public void setFilePart(FilePart filePart) {
         if (filePart == null) {
             remove("filePart");
+            this.filePart = null;
+            System.out.println("delete" + this);
         } else {
             this.filePart = filePart;
             this.put("filePart", filePart);
         }
+    }
+
+    public void setNode(String node) {
+        this.node = node;
+        this.put("node", node);
     }
 
     public Map<String, Object> toMap() {

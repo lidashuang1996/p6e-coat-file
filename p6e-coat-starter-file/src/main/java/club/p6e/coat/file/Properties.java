@@ -28,16 +28,11 @@ public class Properties implements Serializable {
     private SliceUpload sliceUpload = new SliceUpload();
 
     /**
-     * 简单（小文件）上传配置
-     */
-    private SimpleUpload simpleUpload = new SimpleUpload();
-
-    /**
      * 资源配置
      */
     private Map<String, Resource> resources = new HashMap<>();
 
-    private Map<String, Upload> upload = new HashMap<>();
+    private Map<String, Upload> uploads = new HashMap<>();
 
     /**
      * 下载配置
@@ -55,7 +50,7 @@ public class Properties implements Serializable {
          */
         private String type;
         private String path;
-        private Map<String, String> extend;
+        private Map<String, String> extend= new HashMap<>();
 
     }
 
@@ -67,9 +62,10 @@ public class Properties implements Serializable {
          */
         private String type;
         private String path;
-        private Map<String, String> extend;
+        private Map<String, String> extend = new HashMap<>();
 
     }
+
     /**
      * 资源
      */
@@ -82,30 +78,12 @@ public class Properties implements Serializable {
          */
         private String type;
         private String path;
-        private Map<String, String> extend;
+        private Map<String, String> extend = new HashMap<>();
 
         /**
          * 允许的文件后缀以及对应的媒体类型
          */
         private Map<String, MediaType> suffixes = new HashMap<>();
-
-    }
-
-    /**
-     * 简单（小文件）上传
-     */
-    @Data
-    public static class SimpleUpload implements Serializable {
-
-        /**
-         * 基础的文件路径
-         */
-        private String path;
-
-        /**
-         * 允许上传的文件大小的最大值
-         */
-        private long maxSize = 1024 * 1024 * 15;
 
     }
 
