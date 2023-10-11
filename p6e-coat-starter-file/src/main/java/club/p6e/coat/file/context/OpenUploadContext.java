@@ -39,16 +39,12 @@ public class OpenUploadContext extends HashMap<String, Object> implements Serial
     }
 
     public void setName(String name) {
+        this.name = name;
         if (name == null) {
             remove("name");
         } else {
-            this.name = name;
             this.put("name", name);
         }
-    }
-
-    public Map<String, Object> toMap() {
-        return this;
     }
 
 }

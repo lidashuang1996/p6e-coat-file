@@ -53,14 +53,14 @@ public class SimpleUploadHandlerFunction extends AspectHandlerFunction implement
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, SimpleUploadContext.class)
                         // 执行简单（小文件）上传操作之前的切点
-                        .flatMap(c -> before(aspect, c.toMap()))
+                        .flatMap(c -> before(aspect, c))
                         .flatMap(m -> {
                             final SimpleUploadContext context = new SimpleUploadContext(m);
                             return
                                     // 执行简单（小文件）上传服务
                                     service.execute(context)
                                             // 执行简单（小文件）上传操作之后的切点
-                                            .flatMap(r -> after(aspect, context.toMap(), r));
+                                            .flatMap(r -> after(aspect, context, r));
                         })
                         // 结果返回
                         .flatMap(r -> ServerResponse.ok().bodyValue(ResultContext.build(r)));

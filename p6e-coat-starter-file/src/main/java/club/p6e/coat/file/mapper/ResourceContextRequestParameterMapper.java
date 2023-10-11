@@ -60,11 +60,8 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         }
         if (paths != null && !paths.isEmpty()) {
             final String pc = paths.get(0);
-            System.out.println("debg >> " + pc);
             final String path = FileUtil.path(pc);
-            System.out.println("debg >> " + path);
             final String name = FileUtil.name(pc);
-            System.out.println("debg >> " + name);
             if (name == null) {
                 return Mono.error(new ParameterException(
                         this.getClass(),

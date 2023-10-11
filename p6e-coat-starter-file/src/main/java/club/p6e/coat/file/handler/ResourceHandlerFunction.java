@@ -59,7 +59,7 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, ResourceContext.class)
                         // 执行下载操作之前的切点
-                        .flatMap(c -> before(aspect, c.toMap()))
+                        .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
                                 .execute(new ResourceContext(m))
                                 .flatMap(fra -> after(aspect, m, null).map(b -> fra)))

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 public class FileTaskSchedulerConfig {
 
-    @Bean("club.p6e.coat.file.config.TaskScheduler")
+    @Bean("club.p6e.coat.file.task.TaskScheduler")
     public TaskScheduler injectTaskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setThreadNamePrefix("P6E-COAT-TASK-SCHEDULER-");

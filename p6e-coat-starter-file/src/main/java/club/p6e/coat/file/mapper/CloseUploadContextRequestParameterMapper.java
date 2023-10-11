@@ -28,14 +28,14 @@ import java.util.List;
 public class CloseUploadContextRequestParameterMapper extends RequestParameterMapper {
 
     /**
-     * NODE 请求参数
-     */
-    private static final String NODE_PARAMETER_NAME = "node";
-
-    /**
      * URL ID 请求参数
      */
     private static final String URL_PARAMETER_ID = "id";
+
+    /**
+     * NODE 请求参数
+     */
+    private static final String URL_PARAMETER_NODE = "node";
 
     /**
      * PATH URL ID 请求参数
@@ -48,9 +48,19 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
     private static final String FORM_DATA_PARAMETER_ID = "id";
 
     /**
+     * FORM DATA NODE 请求参数
+     */
+    private static final String FORM_DATA_PARAMETER_NODE = "node";
+
+    /**
      * RAW JSON ID 请求参数
      */
     private static final String RAW_JSON_PARAMETER_ID = "id";
+
+    /**
+     * RAW JSON NODE 请求参数
+     */
+    private static final String RAW_JSON_PARAMETER_NODE = "node";
 
     /**
      * 请求路径后缀标记
@@ -68,12 +78,6 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
         final ServerHttpRequest httpRequest = request.exchange().getRequest();
         final MultiValueMap<String, String> queryParams = httpRequest.getQueryParams();
         context.putAll(queryParams);
-        if (queryParams.get("node") != null && !queryParams.get("node").isEmpty()) {
-            System.out.println(
-                    queryParams.get("node").get(0)
-            );
-            context.setNode(queryParams.get("node").get(0));
-        }
         final List<PathContainer.Element> elements = request.requestPath().elements();
         final String requestPathFinishContent = elements.get(elements.size() - 1).value();
         // 如果不是请求后缀标记
@@ -89,85 +93,125 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                         "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
                 ));
             }
-            System.out.println("MAPPER CONTENT + c  " + context.toMap());
-            return Mono.just(context);
-        } else {
-            // 读取 URL ID 请求参数
-            final List<String> ids = queryParams.get(URL_PARAMETER_ID);
-            if (ids != null && !ids.isEmpty()) {
-                try {
-                    // 如果读取到了 URL ID 那么就写入到上下文对象中
-                    context.setId(Integer.valueOf(ids.get(0)));
-                    return Mono.just(context);
-                } catch (Exception e) {
-                    // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
-                    return Mono.error(new ParameterException(
-                            this.getClass(),
-                            "fun execute(ServerRequest request). " +
-                                    "<" + URL_PARAMETER_ID + "> Request parameter type is not int",
-                            "<" + URL_PARAMETER_ID + "> Request parameter type is not int"
-                    ));
-                }
-            } else {
-                // 读取请求的媒体类型
-                final MediaType mediaType = httpRequest.getHeaders().getContentType();
-                if (MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)) {
-                    return requestRawJsonMapper(request, context)
-                            .flatMap(m -> {
-                                final CloseUploadContext newContext = new CloseUploadContext(m);
-                                final Object rjId = newContext.get(RAW_JSON_PREFIX + RAW_JSON_PARAMETER_ID);
-                                if (rjId instanceof final Integer content) {
-                                    newContext.setId(content);
-                                    return Mono.just(newContext);
-                                } else {
-                                    // 如果没有读取到了 RAW JSON ID 请求参数那么就抛出参数异常
-                                    return Mono.error(new ParameterException(
-                                            this.getClass(),
-                                            "fun execute(ServerRequest request). " +
-                                                    "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
-                                            "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
-                                    ));
-                                }
-                            });
-                } else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
-                    return requestFormDataMapper(request, context)
-                            .flatMap(m -> {
-                                final CloseUploadContext newContext = new CloseUploadContext(m);
-                                final Object fdId = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_ID);
-                                if (fdId instanceof final List<?> ol && ol.size() > 0
-                                        && ol.get(0) instanceof final FormFieldPart filePart) {
-                                    try {
-                                        newContext.setId(Integer.valueOf(filePart.value()));
-                                        return Mono.just(newContext);
-                                    } catch (Exception e) {
-                                        // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
-                                        return Mono.error(new ParameterException(
-                                                this.getClass(),
-                                                "fun execute(ServerRequest request). " +
-                                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
-                                                "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
-                                        ));
-                                    }
-                                } else {
-                                    // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
-                                    return Mono.error(new ParameterException(
-                                            this.getClass(),
-                                            "fun execute(ServerRequest request). " +
-                                                    "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
-                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
-                                    ));
-                                }
-                            });
-                } else {
-                    return Mono.error(new ParameterException(
-                            this.getClass(),
-                            "fun execute(ServerRequest request). " +
-                                    "<" + URL_PARAMETER_ID + "> Request parameter is null",
-                            "<" + URL_PARAMETER_ID + "> Request parameter is null"
-                    ));
-                }
+        }
+        if (context.getId() == null
+                && queryParams.get(URL_PARAMETER_ID) != null
+                && !queryParams.get(URL_PARAMETER_ID).isEmpty()) {
+            try {
+                context.setId(Integer.valueOf(queryParams.get(URL_PARAMETER_ID).get(0)));
+            } catch (Exception e) {
+                return Mono.error(new ParameterException(
+                        this.getClass(),
+                        "fun execute(ServerRequest request). " +
+                                "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int",
+                        "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
+                ));
             }
         }
+        if (context.getNode() == null
+                && queryParams.get(URL_PARAMETER_NODE) != null
+                && !queryParams.get(URL_PARAMETER_NODE).isEmpty()) {
+            context.setNode(queryParams.get(URL_PARAMETER_NODE).get(0));
+        }
+        // 读取请求的媒体类型
+        final MediaType mediaType = httpRequest.getHeaders().getContentType();
+        if (MediaType.APPLICATION_JSON.isCompatibleWith(mediaType)) {
+            return requestRawJsonMapper(request, context)
+                    .flatMap(m -> {
+                        final CloseUploadContext newContext = new CloseUploadContext(m);
+                        if (newContext.getId() == null) {
+                            final Object rjId = newContext.get(RAW_JSON_PREFIX + RAW_JSON_PARAMETER_ID);
+                            if (rjId instanceof final Integer content) {
+                                newContext.setId(content);
+                            } else {
+                                // 如果没有读取到了 RAW JSON ID 请求参数那么就抛出参数异常
+                                return Mono.error(new ParameterException(
+                                        this.getClass(),
+                                        "fun execute(ServerRequest request). " +
+                                                "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
+                                        "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
+                                ));
+                            }
+                        }
+                        if (newContext.getNode() == null) {
+                            final Object rjNode = newContext.get(RAW_JSON_PREFIX + RAW_JSON_PARAMETER_NODE);
+                            if (rjNode instanceof final String content) {
+                                newContext.setNode(content);
+                            } else {
+                                // 如果没有读取到了 RAW JSON ID 请求参数那么就抛出参数异常
+                                return Mono.error(new ParameterException(
+                                        this.getClass(),
+                                        "fun execute(ServerRequest request). " +
+                                                "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
+                                        "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
+                                ));
+                            }
+                        }
+                        return Mono.just(newContext);
+                    });
+        } else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
+            return requestFormDataMapper(request, context)
+                    .flatMap(m -> {
+                        final CloseUploadContext newContext = new CloseUploadContext(m);
+                        if (newContext.getId() == null) {
+                            final Object fdId = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_ID);
+                            if (fdId instanceof final List<?> ol && !ol.isEmpty()
+                                    && ol.get(0) instanceof final FormFieldPart filePart) {
+                                try {
+                                    newContext.setId(Integer.valueOf(filePart.value()));
+                                } catch (Exception e) {
+                                    // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
+                                    return Mono.error(new ParameterException(
+                                            this.getClass(),
+                                            "fun execute(ServerRequest request). " +
+                                                    "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
+                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
+                                    ));
+                                }
+                            } else {
+                                // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
+                                return Mono.error(new ParameterException(
+                                        this.getClass(),
+                                        "fun execute(ServerRequest request). " +
+                                                "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
+                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
+                                ));
+                            }
+                        }
+                        if (newContext.getNode() == null) {
+                            final Object fdNode = newContext.get(FORM_DATA_PREFIX + FORM_DATA_PARAMETER_NODE);
+                            if (fdNode instanceof final List<?> ol && !ol.isEmpty()
+                                    && ol.get(0) instanceof final FormFieldPart filePart) {
+                                try {
+                                    newContext.setNode(filePart.value());
+                                } catch (Exception e) {
+                                    // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
+                                    return Mono.error(new ParameterException(
+                                            this.getClass(),
+                                            "fun execute(ServerRequest request). " +
+                                                    "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
+                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
+                                    ));
+                                }
+                            } else {
+                                // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
+                                return Mono.error(new ParameterException(
+                                        this.getClass(),
+                                        "fun execute(ServerRequest request). " +
+                                                "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
+                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
+                                ));
+                            }
+                        }
+                        return Mono.just(newContext);
+                    });
+        } else {
+            return Mono.error(new ParameterException(
+                    this.getClass(),
+                    "fun execute(ServerRequest request). " +
+                            "<" + URL_PARAMETER_ID + "> Request parameter is null",
+                    "<" + URL_PARAMETER_ID + "> Request parameter is null"
+            ));
+        }
     }
-
 }

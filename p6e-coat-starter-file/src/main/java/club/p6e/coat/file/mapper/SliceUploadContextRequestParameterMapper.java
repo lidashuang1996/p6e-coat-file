@@ -95,7 +95,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         // 初始化请求参数 SIGNATURE
         initParameterSignature(request, context);
         // FROM DATA 参数
-        return requestFormDataMapper(request, context.toMap())
+        return requestFormDataMapper(request, context)
                 .flatMap(m -> {
                     final SliceUploadContext newContext = new SliceUploadContext(m);
                     if (newContext.getId() == null) {

@@ -27,6 +27,7 @@ public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
 
     @Override
     public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
+        // 对返回的结果数据进行处理
         final Object id = result.get("id");
         final Object size = result.get("size");
         final String name = String.valueOf(result.get("name"));

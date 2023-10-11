@@ -62,7 +62,7 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, DownloadContext.class)
                         // 执行下载操作之前的切点
-                        .flatMap(c -> before(aspect, c.toMap()))
+                        .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
                                 .execute(new DownloadContext(m))
                                 .flatMap(fra -> after(aspect, m, null).map(b -> fra)))
@@ -81,8 +81,8 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                                 ));
                             }
                             if (!ranges.isEmpty()) {
-                                final long length = fra.model().getLength();
                                 final HttpRange range = ranges.get(0);
+                                final long length = fra.model().getLength();
                                 final long el = range.getRangeEnd(length);
                                 final long sl = range.getRangeStart(length);
                                 final long cl = el - sl + 1;

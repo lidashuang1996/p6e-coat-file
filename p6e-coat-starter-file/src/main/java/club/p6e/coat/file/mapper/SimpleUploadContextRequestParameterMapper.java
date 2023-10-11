@@ -58,8 +58,12 @@ public class SimpleUploadContextRequestParameterMapper extends RequestParameterM
         // 读取 URL 参数并写入
         final MultiValueMap<String, String> queryParams = httpRequest.getQueryParams();
         context.putAll(queryParams);
+        if (queryParams.get(NODE_PARAMETER_NAME) != null
+                && !queryParams.get(NODE_PARAMETER_NAME).isEmpty()) {
+            context.setNode(queryParams.get(NODE_PARAMETER_NAME).get(0));
+        }
         // 读取 FROM DATA 参数并写入
-        return requestFormDataMapper(request, context.toMap())
+        return requestFormDataMapper(request, context)
                 .flatMap(m -> {
                     final SimpleUploadContext newContext = new SimpleUploadContext(m);
                     if (newContext.getNode() == null) {

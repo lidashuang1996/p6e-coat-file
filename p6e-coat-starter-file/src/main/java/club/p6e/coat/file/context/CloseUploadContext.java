@@ -16,10 +16,13 @@ import java.util.Map;
 public class CloseUploadContext extends HashMap<String, Object> implements Serializable {
 
     /**
-     * 上传编号
+     * 编号
      */
     private Integer id;
 
+    /**
+     * 节点
+     */
     private String node;
 
     /**
@@ -34,7 +37,6 @@ public class CloseUploadContext extends HashMap<String, Object> implements Seria
      * @param map 初始化对象
      */
     public CloseUploadContext(Map<String, Object> map) {
-        System.out.println("map: " + map);
         this.putAll(map);
         if (map.get("id") != null && map.get("id") instanceof final Integer content) {
             this.setId(content);
@@ -45,21 +47,21 @@ public class CloseUploadContext extends HashMap<String, Object> implements Seria
     }
 
     public void setId(Integer id) {
+        this.id = id;
         if (id == null) {
             remove("id");
         } else {
-            this.id = id;
             this.put("id", id);
         }
     }
 
     public void setNode(String node) {
         this.node = node;
-        this.put("node", node);
-    }
-
-    public Map<String, Object> toMap() {
-        return this;
+        if (node == null) {
+            remove("node");
+        } else {
+            this.put("node", node);
+        }
     }
 
 }

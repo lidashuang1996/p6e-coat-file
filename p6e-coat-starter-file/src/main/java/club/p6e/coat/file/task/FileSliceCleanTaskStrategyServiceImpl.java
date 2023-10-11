@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -58,26 +59,47 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
 
     @Override
     public String cron() {
-        return "0 0 3 * * *";
+        final int s = ThreadLocalRandom.current().nextInt(2, 6);
+        final int f = ThreadLocalRandom.current().nextInt(0, 60);
+        final int m = ThreadLocalRandom.current().nextInt(0, 60);
+        return m + " " + f + " " + s + " * * *";
     }
 
     @Override
     public void execute() {
-        final AtomicInteger index = new AtomicInteger(0);
-        final Properties.SliceUpload sliceUpload = properties.getSliceUpload();
-        while (true) {
-            final UploadChunkModel model = uploadChunkRepository
-                    .select(index.get(), LocalDateTime.now().minusDays(30)).block();
-            if (model == null || model.getId() == null || model.getFid() == null) {
-                break;
-            } else {
-                index.set(model.getId());
-                final String folder = FileUtil.composePath(sliceUpload.getPath(), String.valueOf(model.getFid()));
-                if (FileUtil.checkFolderExist(folder)) {
-                    FileUtil.deleteFolder(folder);
+        execute1();
+//        execute2();
+//        execute3();
+    }
+
+    private void execute1() {
+        try {
+            final AtomicInteger index = new AtomicInteger(0);
+            final Properties.SliceUpload sliceUpload = properties.getSliceUpload();
+            while (true) {
+                final UploadChunkModel model = uploadChunkRepository
+                        .select(index.get(), LocalDateTime.now().minusDays(30)).block();
+                if (model == null || model.getId() == null || model.getFid() == null) {
+                    break;
+                } else {
+                    index.set(model.getId());
+                    final String folder = FileUtil.composePath(sliceUpload.getPath(), String.valueOf(model.getFid()));
+                    if (FileUtil.checkFolderExist(folder)) {
+                        FileUtil.deleteFolder(folder);
+                    }
+                    uploadChunkRepository.deleteByFid(model.getFid()).block();
                 }
-                uploadChunkRepository.deleteByFid(model.getFid()).block();
             }
+        } catch (Exception e) {
+            LOGGER.error("[P6E FILE TASK ERROR]", e);
+        }
+    }
+
+    private void execute2() {
+        try {
+
+        } catch (Exception e) {
+            LOGGER.error("[P6E FILE TASK ERROR]", e);
         }
     }
 

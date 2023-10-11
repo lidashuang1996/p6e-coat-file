@@ -83,7 +83,7 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
         return repository
                 .create(createUploadModel)
                 .flatMap(m -> fileReadWriteService
-                        .write(name, context.toMap(), file -> filePart.transferTo(file).then(Mono.just(file)))
+                        .write(name, context, file -> filePart.transferTo(file).then(Mono.just(file)))
                         .map(fam -> {
                             System.out.println("!!!!  " + fam);
                             final UploadModel updateUploadModel = new UploadModel();

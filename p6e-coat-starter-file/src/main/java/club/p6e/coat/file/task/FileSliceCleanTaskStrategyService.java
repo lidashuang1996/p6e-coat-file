@@ -9,7 +9,7 @@ package club.p6e.coat.file.task;
 public interface FileSliceCleanTaskStrategyService {
 
     /**
-     * 执行文件清除时间策略
+     * 时间策略
      */
     public String cron();
 

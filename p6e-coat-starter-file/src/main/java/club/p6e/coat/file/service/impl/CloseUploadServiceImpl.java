@@ -67,7 +67,6 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                 .closeLock(context.getId())
                 .flatMap(l -> repository.findById(context.getId()))
                 .flatMap(m -> {
-                    System.out.println(">>> context >> " + context.toMap());
                     final Object operator = context.get("operator");
                     if (operator instanceof final String content) {
                         m.setOperator(content);
@@ -88,9 +87,8 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                             }
                         }
                     }
-                    System.out.println("文件合并的顺序是: " + Arrays.toString(files));
                     return fileReadWriteService
-                            .write(m.getName(), context.toMap(), file -> FileUtil.mergeFileSlice(files, file))
+                            .write(m.getName(), context, file -> FileUtil.mergeFileSlice(files, file))
                             .flatMap(fm -> repository
                                     .update(new UploadModel()
                                             .setId(m.getId())

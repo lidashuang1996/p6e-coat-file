@@ -67,7 +67,7 @@ public class ResourceServiceImpl implements ResourceService {
                 final MediaType mediaType = suffixes.get(suffix);
                 final Map<String, Object> data = new HashMap<>();
                 data.putAll(resource.getExtend());
-                data.putAll(context.toMap());
+                data.putAll(context);
                 return fileReadWriteService.read(resource.getType(), resource.getPath(), path, mediaType, data);
             } else {
                 return Mono.error(new ResourceNodeException(

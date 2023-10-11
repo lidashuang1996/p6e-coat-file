@@ -17,8 +17,8 @@ import java.util.Map;
  * @version 1.0
  */
 @Data
-@Accessors(chain = true)
 @Component
+@Accessors(chain = true)
 @ConfigurationProperties(prefix = "p6e.coat.file")
 public class Properties implements Serializable {
 
@@ -28,11 +28,14 @@ public class Properties implements Serializable {
     private SliceUpload sliceUpload = new SliceUpload();
 
     /**
+     * 上传配置
+     */
+    private Map<String, Upload> uploads = new HashMap<>();
+
+    /**
      * 资源配置
      */
     private Map<String, Resource> resources = new HashMap<>();
-
-    private Map<String, Upload> uploads = new HashMap<>();
 
     /**
      * 下载配置
@@ -45,23 +48,20 @@ public class Properties implements Serializable {
     @Data
     @Accessors(chain = true)
     public static class Upload implements Serializable {
+
+        /**
+         * 资源类型
+         */
+        private String type;
+
         /**
          * 基础的文件路径
          */
-        private String type;
         private String path;
-        private Map<String, String> extend= new HashMap<>();
 
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class Download implements Serializable {
         /**
-         * 基础的文件路径
+         * 扩展参数
          */
-        private String type;
-        private String path;
         private Map<String, String> extend = new HashMap<>();
 
     }
@@ -74,16 +74,45 @@ public class Properties implements Serializable {
     public static class Resource implements Serializable {
 
         /**
-         * 基础的文件路径
+         * 资源类型
          */
         private String type;
+
+        /**
+         * 基础的文件路径
+         */
         private String path;
+
+        /**
+         * 扩展参数
+         */
         private Map<String, String> extend = new HashMap<>();
 
         /**
          * 允许的文件后缀以及对应的媒体类型
          */
         private Map<String, MediaType> suffixes = new HashMap<>();
+
+    }
+
+    @Data
+    @Accessors(chain = true)
+    public static class Download implements Serializable {
+
+        /**
+         * 资源类型
+         */
+        private String type;
+
+        /**
+         * 基础的文件路径
+         */
+        private String path;
+
+        /**
+         * 扩展参数
+         */
+        private Map<String, String> extend = new HashMap<>();
 
     }
 
@@ -97,12 +126,12 @@ public class Properties implements Serializable {
         /**
          * 基础的文件路径
          */
-        private String path;
+        private String path = "/opt/data/slice";
 
         /**
          * 允许上传的文件大小的最大值
          */
-        private long maxSize = 1024 * 1024 * 15;
+        private long maxSize = 1024 * 1024 * 20;
 
     }
 

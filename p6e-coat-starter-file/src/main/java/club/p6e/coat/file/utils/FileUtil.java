@@ -511,6 +511,13 @@ public final class FileUtil {
         }
     }
 
+    /**
+     * 合并文件分片
+     *
+     * @param files 文件列表
+     * @param file  合并后的文件对象
+     * @return 合并后的文件对象
+     */
     public static Mono<File> mergeFileSlice(File[] files, File file) {
         if (files == null
                 || file == null

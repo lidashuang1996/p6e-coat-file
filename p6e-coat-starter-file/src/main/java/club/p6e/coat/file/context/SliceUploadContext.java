@@ -64,43 +64,39 @@ public class SliceUploadContext extends HashMap<String, Object> implements Seria
     }
 
     public void setId(Integer id) {
+        this.id = id;
         if (id == null) {
             remove("id");
         } else {
-            this.id = id;
             this.put("id", id);
         }
     }
 
     public void setIndex(Integer index) {
+        this.index = index;
         if (index == null) {
             remove("index");
         } else {
-            this.index = index;
             this.put("index", index);
         }
     }
 
     public void setSignature(String signature) {
+        this.signature = signature;
         if (signature == null) {
             remove("signature");
         } else {
-            this.signature = signature;
             this.put("signature", signature);
         }
     }
 
     public void setFilePart(FilePart filePart) {
+        this.filePart = filePart;
         if (filePart == null) {
             remove("filePart");
         } else {
-            this.filePart = filePart;
             this.put("filePart", filePart);
         }
-    }
-
-    public Map<String, Object> toMap() {
-        return this;
     }
 
 }

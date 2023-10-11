@@ -16,6 +16,11 @@ import java.io.Serializable;
 public class FileActuatorModel implements Serializable {
 
     /**
+     * 资源类型
+     */
+    private String type;
+
+    /**
      * 文件名称
      */
     private String name;
@@ -26,12 +31,8 @@ public class FileActuatorModel implements Serializable {
     private String path;
 
     /**
-     * 资源类型
-     */
-    private String type;
-
-    /**
      * 文件长度
      */
     private long length;
+
 }

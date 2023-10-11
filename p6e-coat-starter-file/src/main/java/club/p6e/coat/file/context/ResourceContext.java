@@ -47,25 +47,21 @@ public class ResourceContext extends HashMap<String, Object> implements Serializ
     }
 
     public void setNode(String node) {
+        this.node = node;
         if (node == null) {
             remove("node");
         } else {
-            this.node = node;
             this.put("node", node);
         }
     }
 
     public void setPath(String path) {
+        this.path = path;
         if (path == null) {
             remove("path");
         } else {
-            this.path = path;
             this.put("path", path);
         }
-    }
-
-    public Map<String, Object> toMap() {
-        return this;
     }
 
 }

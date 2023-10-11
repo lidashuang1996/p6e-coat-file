@@ -53,14 +53,14 @@ public class CloseUploadHandlerFunction extends AspectHandlerFunction implements
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, CloseUploadContext.class)
                         // 执行关闭上传操作之前的切点
-                        .flatMap(c -> before(aspect, c.toMap()))
+                        .flatMap(c -> before(aspect, c))
                         .flatMap(m -> {
                             final CloseUploadContext context = new CloseUploadContext(m);
                             return
                                     // 执行关闭上传服务
                                     service.execute(context)
                                             // 执行关闭上传操作之后的切点
-                                            .flatMap(r -> after(aspect, context.toMap(), r));
+                                            .flatMap(r -> after(aspect, context, r));
                         })
                         // 结果返回
                         .flatMap(r -> ServerResponse.ok().bodyValue(ResultContext.build(r)));
