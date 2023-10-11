@@ -14,6 +14,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class P6eCoatFileApplication {
 
     public static void main(String[] args) {
+        // 跨域
+        // 盗链
         SpringApplication.run(P6eCoatFileApplication.class, args);
     }
 
