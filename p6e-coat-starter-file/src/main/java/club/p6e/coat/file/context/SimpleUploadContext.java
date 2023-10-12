@@ -47,21 +47,21 @@ public class SimpleUploadContext extends HashMap<String, Object> implements Seri
         }
     }
 
+    public void setNode(String node) {
+        this.node = node;
+        if (node == null) {
+            remove("node");
+        } else {
+            this.put("node", node);
+        }
+    }
+
     public void setFilePart(FilePart filePart) {
         this.filePart = filePart;
         if (filePart == null) {
             remove("filePart");
         } else {
             this.put("filePart", filePart);
-        }
-    }
-
-    public void setNode(String node) {
-        this.node = node;
-        if (filePart == null) {
-            remove("node");
-        } else {
-            this.put("node", node);
         }
     }
 

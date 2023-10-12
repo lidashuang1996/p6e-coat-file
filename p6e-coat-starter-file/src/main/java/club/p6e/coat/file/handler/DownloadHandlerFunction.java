@@ -65,7 +65,7 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
                                 .execute(new DownloadContext(m))
-                                .flatMap(fra -> after(aspect, m, null).map(b -> fra)))
+                                .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
                         .flatMap(fra -> {
                             final String fc;
                             final List<HttpRange> ranges = request.headers().range();

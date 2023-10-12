@@ -62,7 +62,7 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
                                 .execute(new ResourceContext(m))
-                                .flatMap(fra -> after(aspect, m, null).map(b -> fra)))
+                                .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
                         // 结果返回
                         .flatMap(fra -> {
                             final MediaType mediaType = fra.mediaType();

@@ -12,6 +12,11 @@ import java.io.File;
  */
 public interface FileWriteActuator {
 
+    public String type();
+
+
+    public String path();
+
     /**
      * 执行写入操作
      *

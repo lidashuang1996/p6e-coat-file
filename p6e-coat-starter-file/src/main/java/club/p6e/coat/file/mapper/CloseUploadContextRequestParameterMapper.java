@@ -88,29 +88,31 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
             } catch (Exception e) {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request). " +
-                                "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int",
-                        "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
+                        "fun execute(ServerRequest request). -> PATH PARAM <"
+                                + PATH_URL_PARAMETER_ID + "> Request parameter type not is int",
+                        "PATH PARAM <" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
                 ));
             }
         }
         if (context.getId() == null
                 && queryParams.get(URL_PARAMETER_ID) != null
-                && !queryParams.get(URL_PARAMETER_ID).isEmpty()) {
+                && !queryParams.get(URL_PARAMETER_ID).isEmpty()
+                && queryParams.get(URL_PARAMETER_ID).get(0) != null) {
             try {
                 context.setId(Integer.valueOf(queryParams.get(URL_PARAMETER_ID).get(0)));
             } catch (Exception e) {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request). " +
-                                "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int",
-                        "<" + PATH_URL_PARAMETER_ID + "> Request parameter type not is int"
+                        "fun execute(ServerRequest request). -> URL PARAM <"
+                                + URL_PARAMETER_ID + "> Request parameter type not is int",
+                        "URL PARAM <" + URL_PARAMETER_ID + "> Request parameter type not is int"
                 ));
             }
         }
         if (context.getNode() == null
                 && queryParams.get(URL_PARAMETER_NODE) != null
-                && !queryParams.get(URL_PARAMETER_NODE).isEmpty()) {
+                && !queryParams.get(URL_PARAMETER_NODE).isEmpty()
+                && queryParams.get(URL_PARAMETER_NODE).get(0) != null) {
             context.setNode(queryParams.get(URL_PARAMETER_NODE).get(0));
         }
         // 读取请求的媒体类型
@@ -127,9 +129,9 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                                 // 如果没有读取到了 RAW JSON ID 请求参数那么就抛出参数异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
-                                                "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
-                                        "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
+                                        "fun execute(ServerRequest request). -> RAW JSON PARAM <"
+                                                + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
+                                        "RAW JSON PARAM <" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
                                 ));
                             }
                         }
@@ -141,9 +143,9 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                                 // 如果没有读取到了 RAW JSON ID 请求参数那么就抛出参数异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
-                                                "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
-                                        "<" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
+                                        "fun execute(ServerRequest request). -> RAW JSON PARAM <"
+                                                + RAW_JSON_PARAMETER_ID + "> Request parameter is null",
+                                        "RAW JSON PARAM <" + RAW_JSON_PARAMETER_ID + "> Request parameter is null"
                                 ));
                             }
                         }
@@ -163,18 +165,17 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                                     // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
                                     return Mono.error(new ParameterException(
                                             this.getClass(),
-                                            "fun execute(ServerRequest request). " +
-                                                    "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
-                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
+                                            "fun execute(ServerRequest request). -> FORM DATA PARAM <"
+                                                    + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
+                                            "FORM DATA PARAM <" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
                                     ));
                                 }
                             } else {
                                 // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
-                                                "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
-                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
+                                        "fun execute(ServerRequest request). -> Request parameter is null",
+                                        "Request parameter is null"
                                 ));
                             }
                         }
@@ -188,30 +189,32 @@ public class CloseUploadContextRequestParameterMapper extends RequestParameterMa
                                     // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
                                     return Mono.error(new ParameterException(
                                             this.getClass(),
-                                            "fun execute(ServerRequest request). " +
+                                            "fun execute(ServerRequest request). -> FORM DATA PARAM " +
                                                     "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
-                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
+                                            "FORM DATA PARAM <" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
                                     ));
                                 }
                             } else {
                                 // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
-                                                "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
-                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
+                                        "fun execute(ServerRequest request). -> Request parameter is null",
+                                        "Request parameter is null"
                                 ));
                             }
                         }
                         return Mono.just(newContext);
                     });
         } else {
-            return Mono.error(new ParameterException(
-                    this.getClass(),
-                    "fun execute(ServerRequest request). " +
-                            "<" + URL_PARAMETER_ID + "> Request parameter is null",
-                    "<" + URL_PARAMETER_ID + "> Request parameter is null"
-            ));
+            if (context.getId() == null || context.getNode() == null) {
+                return Mono.error(new ParameterException(
+                        this.getClass(),
+                        "fun execute(ServerRequest request). -> Request parameter is null",
+                        "Request parameter is null"
+                ));
+            } else {
+                return Mono.just(context);
+            }
         }
     }
 }

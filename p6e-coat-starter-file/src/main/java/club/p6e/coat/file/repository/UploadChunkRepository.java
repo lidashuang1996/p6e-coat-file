@@ -69,7 +69,6 @@ public class UploadChunkRepository {
         if (model.getOperator() == null) {
             model.setOperator("sys");
         }
-        System.out.println(" >>>>>>>>>>>>>>>>>           " + model);
         return Mono.usingWhen(
                         this.factory.create(),
                         connection -> {
@@ -84,11 +83,7 @@ public class UploadChunkRepository {
                         },
                         Connection::close
                 )
-                .flatMap(id -> {
-                    model.setId(id);
-                    System.out.println("CHUNK 最新模块是  " + model);
-                    return Mono.just(model);
-                });
+                .flatMap(id -> Mono.just(model.setId(id)));
     }
 
     /**

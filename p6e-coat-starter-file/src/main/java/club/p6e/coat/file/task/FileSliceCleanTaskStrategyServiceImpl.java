@@ -68,8 +68,6 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
     @Override
     public void execute() {
         execute1();
-//        execute2();
-//        execute3();
     }
 
     private void execute1() {
@@ -90,14 +88,6 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
                     uploadChunkRepository.deleteByFid(model.getFid()).block();
                 }
             }
-        } catch (Exception e) {
-            LOGGER.error("[P6E FILE TASK ERROR]", e);
-        }
-    }
-
-    private void execute2() {
-        try {
-
         } catch (Exception e) {
             LOGGER.error("[P6E FILE TASK ERROR]", e);
         }

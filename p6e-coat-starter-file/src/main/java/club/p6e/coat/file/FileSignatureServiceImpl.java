@@ -3,6 +3,7 @@ package club.p6e.coat.file;
 import club.p6e.coat.file.error.FileException;
 import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -40,10 +41,16 @@ public class FileSignatureServiceImpl implements FileSignatureService {
                 .flatMap(f -> FileUtil
                         .readFile(file)
                         .flatMap(buffer -> {
-                            digestAlgorithm.input(buffer.toByteBuffer().array());
-                            return Mono.just(buffer.readPosition());
-                        })
-                        .collectList())
+                            try {
+                                final int count = buffer.readableByteCount();
+                                final byte[] bytes = new byte[count];
+                                buffer.read(bytes);
+                                digestAlgorithm.input(bytes);
+                                return Mono.just(count);
+                            } finally {
+                                DataBufferUtils.release(buffer);
+                            }
+                        }).count())
                 .map(l -> digestAlgorithmBytesToHexString(digestAlgorithm.output()));
     }
 

@@ -62,11 +62,12 @@ public class DownloadServiceImpl implements DownloadService {
                     "Unable to find corresponding download node")
             );
         } else {
-            final Map<String, Object> data = new HashMap<>() {{
+            final Map<String, Object> extend = new HashMap<>() {{
                 putAll(download.getExtend());
+                putAll(context);
             }};
             return fileReadWriteService.read(download.getType(),
-                    download.getPath(), context.getPath(), MediaType.APPLICATION_OCTET_STREAM, data);
+                    download.getPath(), context.getPath(), MediaType.APPLICATION_OCTET_STREAM, extend);
         }
     }
 }

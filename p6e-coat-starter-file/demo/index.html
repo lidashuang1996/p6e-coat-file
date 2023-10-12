@@ -160,7 +160,7 @@
     const uploadSliceFileEnd = async (id) => {
         return await new Promise(resolve => {
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", BASE_URL + "/upload/slice/close/" + id + "?node=test");
+            xhr.open("POST", BASE_URL + "/upload/slice/close?id=" + id + "&node=test");
             xhr.onload = () => {
                 if (xhr.status === 200) {
                     document.getElementById('upload-slice-file-span').innerText = '100';
@@ -215,11 +215,12 @@
         return new Promise(resolve => {
             // 创建 FormData 对象并添加文件数据
             const formData = new FormData();
+            formData.set("id", id);
             formData.set("index", index);
             formData.set("signature", signature);
             formData.set("file", new Blob([u8]), index + ".chunk");
             const xhr = new XMLHttpRequest();
-            xhr.open("POST", BASE_URL + "/upload/slice/" + id);
+            xhr.open("POST", BASE_URL + "/upload/slice");
             xhr.onload = () => {
                 if (xhr.status === 200) {
                     resolve(true);

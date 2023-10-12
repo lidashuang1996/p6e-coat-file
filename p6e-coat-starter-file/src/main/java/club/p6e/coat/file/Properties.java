@@ -7,7 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,6 +23,21 @@ import java.util.Map;
 @Accessors(chain = true)
 @ConfigurationProperties(prefix = "p6e.coat.file")
 public class Properties implements Serializable {
+
+    /**
+     * HOST 配置
+     */
+    private Host host = new Host();
+
+    /**
+     * REFERER 配置
+     */
+    private Referer referer = new Referer();
+
+    /**
+     * 跨域配置
+     */
+    private CrossDomain crossDomain = new CrossDomain();
 
     /**
      * 分片上传配置
@@ -41,6 +58,58 @@ public class Properties implements Serializable {
      * 下载配置
      */
     private Map<String, Download> downloads = new HashMap<>();
+
+    /**
+     * 跨域配置
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class CrossDomain implements Serializable {
+
+        /**
+         * 是否启用
+         */
+        private boolean enable = false;
+
+    }
+
+    /**
+     * HOST 配置
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class Host implements Serializable {
+
+        /**
+         * 是否启用
+         */
+        private boolean enable = false;
+
+        /**
+         * HOST 配置
+         */
+        private List<String> list = new ArrayList<>();
+
+    }
+
+    /**
+     * REFERER 配置
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class Referer implements Serializable {
+
+        /**
+         * 是否启用
+         */
+        private boolean enable = false;
+
+        /**
+         * REFERER 配置
+         */
+        private List<String> list = new ArrayList<>();
+
+    }
 
     /**
      * 下载

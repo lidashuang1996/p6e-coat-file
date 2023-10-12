@@ -3,6 +3,7 @@ package club.p6e.coat.file;
 import club.p6e.coat.file.actuator.FileActuatorModel;
 import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.actuator.FileWriteActuator;
+import club.p6e.coat.file.error.ResourceNodeException;
 import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -26,9 +27,9 @@ import java.util.Map;
 public class FileReadWriteServiceImpl implements FileReadWriteService {
 
     /**
-     * 文件配置对象
+     * DISK 资源类型
      */
-    private final Properties properties;
+    private static final String DISK_RESOURCE_TYPE = "DISK";
 
     /**
      * 文件存储位置的路径服务
@@ -38,25 +39,20 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
     /**
      * 构造方法初始化
      *
-     * @param properties                       文件配置对象
      * @param folderStorageLocationPathService 文件存储位置的路径服务
      */
-    public FileReadWriteServiceImpl(
-            Properties properties,
-            FolderStorageLocationPathService folderStorageLocationPathService) {
-        this.properties = properties;
+    public FileReadWriteServiceImpl(FolderStorageLocationPathService folderStorageLocationPathService) {
         this.folderStorageLocationPathService = folderStorageLocationPathService;
     }
 
     @Override
     public Mono<FileActuatorModel> write(String name, Map<String, Object> extend, FileWriteActuator fileWriteActuator) {
-        System.out.println(extend);
-        final Object node = extend.get("node");
-        if (node instanceof final String content) {
-            final Properties.Upload upload = properties.getUploads().get(content);
+        final String type = fileWriteActuator.type();
+        if (DISK_RESOURCE_TYPE.equalsIgnoreCase(type)) {
             final String path = folderStorageLocationPathService.path();
             final String relativePath = FileUtil.composePath(path, name);
-            final String absolutePath = FileUtil.convertAbsolutePath(FileUtil.composePath(upload.getPath(), relativePath));
+            final String absolutePath = FileUtil.convertAbsolutePath(
+                    FileUtil.composePath(fileWriteActuator.path(), relativePath));
             final File file = new File(absolutePath);
             final File folder = file.getParentFile();
             if (!FileUtil.checkFolderExist(folder)) {
@@ -68,22 +64,24 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
                         final FileActuatorModel fam = new FileActuatorModel();
                         fam.setName(name);
                         fam.setPath(path);
-                        fam.setType("DISK");
                         fam.setLength(f.length());
-                        System.out.println("family: " + fam);
+                        fam.setType(DISK_RESOURCE_TYPE);
                         return Mono.just(fam);
                     });
         } else {
-            return Mono.empty();
+            return Mono.error(new ResourceNodeException(
+                    this.getClass(),
+                    "fun write(String name, Map<String, Object> extend, FileWriteActuator fileWriteActuator). " +
+                            "-> Unable to process current [" + type + "]resource type data.",
+                    "Unable to process current[" + type + "] resource type data")
+            );
         }
     }
 
     @Override
     public Mono<FileReadActuator> read(
-            String type, String base, String path, MediaType mediaType, Map<String, Object> extend) {
-        System.out.println(type);
-        System.out.println(base);
-        System.out.println(path);
+            String type, String base, String path, MediaType mediaType, Map<String, Object> extend
+    ) {
         final File file = new File(FileUtil.composePath(base, path));
         return Mono.just(new FileReadActuator() {
 

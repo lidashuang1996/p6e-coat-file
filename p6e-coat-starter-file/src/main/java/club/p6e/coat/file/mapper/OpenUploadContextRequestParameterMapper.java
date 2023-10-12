@@ -54,15 +54,15 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
         context.putAll(queryParams);
         // 读取 URL 文件名称请求参数
         final List<String> names = queryParams.get(URL_PARAMETER_NAME);
-        if (names != null && !names.isEmpty()) {
+        if (names != null && !names.isEmpty() && names.get(0) != null) {
             // 如果读取到了 URL 文件名称请求参数那么就写入到上下文对象中
             final String name = FileUtil.name(names.get(0));
             if (name == null) {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request). " +
-                                "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error",
-                        "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error"
+                        "fun execute(ServerRequest request). -> URL PARAM <"
+                                + URL_PARAMETER_NAME + "> Request parameter format error",
+                        "URL PARAM <" + URL_PARAMETER_NAME + "> Request parameter format error"
                 ));
             }
             context.setName(name);
@@ -80,9 +80,9 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
                                 if (name == null) {
                                     return Mono.error(new ParameterException(
                                             this.getClass(),
-                                            "fun execute(ServerRequest request). " +
-                                                    "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error",
-                                            "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error"
+                                            "fun execute(ServerRequest request). -> RAW JSON <"
+                                                    + RAW_JSON_PARAMETER_NAME + "> Request parameter format error",
+                                            "RAW JSON <" + RAW_JSON_PARAMETER_NAME + "> Request parameter format error"
                                     ));
                                 }
                                 newContext.setName(name);
@@ -91,9 +91,8 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
                             // 如果没有读取到了 RAW JSON 文件名称请求参数那么就抛出参数异常
                             return Mono.error(new ParameterException(
                                     this.getClass(),
-                                    "fun execute(ServerRequest request). " +
-                                            "<" + RAW_JSON_PARAMETER_NAME + "> Request parameter is null",
-                                    "<" + RAW_JSON_PARAMETER_NAME + "> Request parameter is null"
+                                    "fun execute(ServerRequest request) -> Request parameter is null",
+                                    "Request parameter is null"
                             ));
                         });
             } else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
@@ -107,9 +106,9 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
                                 if (name == null) {
                                     return Mono.error(new ParameterException(
                                             this.getClass(),
-                                            "fun execute(ServerRequest request)." +
-                                                    "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error",
-                                            "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error"
+                                            "fun execute(ServerRequest request). -> FORM DATA <"
+                                                    + FORM_DATA_PARAMETER_NAME + "> Request parameter format error",
+                                            "FORM DATA <" + FORM_DATA_PARAMETER_NAME + "> Request parameter format error"
                                     ));
                                 }
                                 newContext.setName(FileUtil.name(content));
@@ -118,18 +117,16 @@ public class OpenUploadContextRequestParameterMapper extends RequestParameterMap
                             // 如果没有读取到了 FORM DATA 文件名称请求参数那么就抛出参数异常
                             return Mono.error(new ParameterException(
                                     this.getClass(),
-                                    "fun execute(ServerRequest request)" +
-                                            "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter is null",
-                                    "<" + FORM_DATA_PARAMETER_NAME + "> Request parameter is null"
+                                    "fun execute(ServerRequest request) -> Request parameter is null",
+                                    "Request parameter is null"
                             ));
 
                         });
             } else {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request) " +
-                                "<" + URL_PARAMETER_NAME + "> Request parameter is null",
-                        "<" + URL_PARAMETER_NAME + "> Request parameter is null"
+                        "fun execute(ServerRequest request) -> Request parameter is null",
+                        "Request parameter is null"
                 ));
             }
         }

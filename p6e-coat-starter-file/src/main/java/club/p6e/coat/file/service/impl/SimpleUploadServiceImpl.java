@@ -1,6 +1,9 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.file.FileReadWriteService;
+import club.p6e.coat.file.Properties;
+import club.p6e.coat.file.actuator.FileWriteActuator;
+import club.p6e.coat.file.error.ResourceNodeException;
 import club.p6e.coat.file.service.SimpleUploadService;
 import club.p6e.coat.file.context.SimpleUploadContext;
 import club.p6e.coat.file.error.ParameterException;
@@ -12,6 +15,8 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,6 +38,11 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
     private static final String SOURCE = "SIMPLE_UPLOAD";
 
     /**
+     * 配置文件对象
+     */
+    private final Properties properties;
+
+    /**
      * 上传存储库对象
      */
     private final UploadRepository repository;
@@ -49,19 +59,28 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
      * @param fileReadWriteService 文件读取写入服务对象
      */
     public SimpleUploadServiceImpl(
+            Properties properties,
             UploadRepository repository,
             FileReadWriteService fileReadWriteService
     ) {
+        this.properties = properties;
         this.repository = repository;
         this.fileReadWriteService = fileReadWriteService;
     }
 
     @Override
     public Mono<Map<String, Object>> execute(SimpleUploadContext context) {
-        // 读取并清除文件对象
+        final Properties.Upload upload = properties.getUploads().get(context.getNode());
+        if (upload == null) {
+            return Mono.error(new ResourceNodeException(
+                    this.getClass(),
+                    "fun execute(SimpleUploadContext context). " +
+                            "-> Unable to find corresponding resource context node.",
+                    "Unable to find corresponding resource context node")
+            );
+        }
         final FilePart filePart = context.getFilePart();
         context.setFilePart(null);
-        System.out.println(context);
         final String name = FileUtil.name(filePart.filename());
         if (name == null) {
             return Mono.error(new ParameterException(
@@ -79,19 +98,35 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
         }
         createUploadModel.setName(name);
         createUploadModel.setSource(SOURCE);
-        System.out.println(createUploadModel);
+        final Map<String, Object> extend = new HashMap<>() {{
+            putAll(upload.getExtend());
+            putAll(context);
+        }};
         return repository
                 .create(createUploadModel)
                 .flatMap(m -> fileReadWriteService
-                        .write(name, context, file -> filePart.transferTo(file).then(Mono.just(file)))
+                        .write(name, extend, new FileWriteActuator() {
+                            @Override
+                            public String type() {
+                                return upload.getType();
+                            }
+
+                            @Override
+                            public String path() {
+                                return upload.getPath();
+                            }
+
+                            @Override
+                            public Mono<File> execute(File file) {
+                                return filePart.transferTo(file).then(Mono.just(file));
+                            }
+                        })
                         .map(fam -> {
-                            System.out.println("!!!!  " + fam);
                             final UploadModel updateUploadModel = new UploadModel();
                             updateUploadModel.setId(m.getId());
                             updateUploadModel.setSize(fam.getLength());
                             updateUploadModel.setStorageType(fam.getType());
                             updateUploadModel.setStorageLocation(fam.getPath());
-                            System.out.println(updateUploadModel);
                             return updateUploadModel;
                         }))
                 .flatMap(m -> Mono.just(m)

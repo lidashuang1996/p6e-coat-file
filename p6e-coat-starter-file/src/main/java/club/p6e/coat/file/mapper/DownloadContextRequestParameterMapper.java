@@ -47,27 +47,27 @@ public class DownloadContextRequestParameterMapper extends RequestParameterMappe
         final DownloadContext context = new DownloadContext();
         context.putAll(queryParams);
         final List<String> nodes = queryParams.get(NODE_PARAMETER_NAME);
-        if (nodes != null && !nodes.isEmpty()) {
+        if (nodes != null && !nodes.isEmpty() && nodes.get(0) != null) {
             context.setNode(nodes.get(0));
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). " +
-                            "<" + NODE_PARAMETER_NAME + "> Request parameter format error",
-                    "<" + NODE_PARAMETER_NAME + "> Request parameter is null"
+                    "fun execute(ServerRequest request). -> URL PARAM <"
+                            + NODE_PARAMETER_NAME + "> Request parameter format error",
+                    "URL PARAM <" + NODE_PARAMETER_NAME + "> Request parameter is null"
             ));
         }
         final List<String> paths = queryParams.get(PATH_PARAMETER_NAME);
-        if (paths != null && !paths.isEmpty()) {
+        if (paths != null && !paths.isEmpty() && paths.get(0) != null) {
             final String pc = paths.get(0);
             final String name = FileUtil.name(pc);
             final String path = FileUtil.path(pc);
             if (name == null) {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request). " +
-                                "<" + PATH_PARAMETER_NAME + "> Request parameter format error",
-                        "<" + PATH_PARAMETER_NAME + "> Request parameter format error"
+                        "fun execute(ServerRequest request). -> URL PARAM <"
+                                + PATH_PARAMETER_NAME + "> Request parameter format error",
+                        "URL PARAM <" + PATH_PARAMETER_NAME + "> Request parameter format error"
                 ));
             } else {
                 context.setPath(FileUtil.composePath(path, name));
@@ -75,9 +75,8 @@ public class DownloadContextRequestParameterMapper extends RequestParameterMappe
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). " +
-                            "<" + PATH_PARAMETER_NAME + "> Request parameter is null",
-                    "<" + PATH_PARAMETER_NAME + "> Request parameter is null"
+                    "fun execute(ServerRequest request). Request parameter is null",
+                    "Request parameter is null"
             ));
         }
         return Mono.just(context);

@@ -1,6 +1,8 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.file.FileReadWriteService;
+import club.p6e.coat.file.actuator.FileWriteActuator;
+import club.p6e.coat.file.error.ResourceNodeException;
 import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.service.CloseUploadService;
 import club.p6e.coat.file.context.CloseUploadContext;
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -63,6 +65,15 @@ public class CloseUploadServiceImpl implements CloseUploadService {
 
     @Override
     public Mono<Map<String, Object>> execute(CloseUploadContext context) {
+        final Properties.Upload upload = properties.getUploads().get(context.getNode());
+        if (upload == null) {
+            return Mono.error(new ResourceNodeException(
+                    this.getClass(),
+                    "fun execute(CloseUploadContext context). " +
+                            "-> Unable to find corresponding resource context node.",
+                    "Unable to find corresponding resource context node")
+            );
+        }
         return repository
                 .closeLock(context.getId())
                 .flatMap(l -> repository.findById(context.getId()))
@@ -87,8 +98,27 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                             }
                         }
                     }
+                    final Map<String, Object> extend = new HashMap<>() {{
+                        putAll(upload.getExtend());
+                        putAll(context);
+                    }};
                     return fileReadWriteService
-                            .write(m.getName(), context, file -> FileUtil.mergeFileSlice(files, file))
+                            .write(m.getName(), extend, new FileWriteActuator() {
+                                @Override
+                                public String type() {
+                                    return upload.getType();
+                                }
+
+                                @Override
+                                public String path() {
+                                    return upload.getPath();
+                                }
+
+                                @Override
+                                public Mono<File> execute(File file) {
+                                    return FileUtil.mergeFileSlice(files, file);
+                                }
+                            })
                             .flatMap(fm -> repository
                                     .update(new UploadModel()
                                             .setId(m.getId())

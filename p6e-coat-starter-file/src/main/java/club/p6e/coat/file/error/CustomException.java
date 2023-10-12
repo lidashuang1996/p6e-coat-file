@@ -1,7 +1,9 @@
 package club.p6e.coat.file.error;
 
-import java.util.HashMap;
+import lombok.Getter;
+
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 自定义异常
@@ -9,12 +11,14 @@ import java.util.Map;
  * @author lidashuang
  * @version 1.0
  */
+@Getter
 public abstract class CustomException extends RuntimeException {
 
     /**
      * 转型器缓存
      */
-    private static final Map<Class<? extends Exception>, CustomException> TRANSFORMER_CACHE = new HashMap<>();
+    private static final Map<Class<? extends Exception>,
+            CustomException> TRANSFORMER_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 代码
@@ -62,7 +66,8 @@ public abstract class CustomException extends RuntimeException {
      * @param sketch  简述
      * @return 模版的输出内容
      */
-    private static String template(Class<?> sc, Class<? extends CustomException> ec, String error, int code, String sketch, String content) {
+    private static String template(Class<?> sc, Class<? extends CustomException> ec,
+                                   String error, int code, String sketch, String content) {
         return "{ " + sketch + " <" + code + "> [" + content + "] } ::: [ " + sc + " ] => (" + ec + ") ===> " + error;
     }
 
@@ -102,30 +107,4 @@ public abstract class CustomException extends RuntimeException {
         this.content = content;
     }
 
-    /**
-     * 获取代码
-     *
-     * @return 代码内容
-     */
-    public int getCode() {
-        return code;
-    }
-
-    /**
-     * 获取简述
-     *
-     * @return 简述内容
-     */
-    public String getSketch() {
-        return sketch;
-    }
-
-    /**
-     * 获取内容
-     *
-     * @return 描述的内容
-     */
-    public String getContent() {
-        return content;
-    }
 }

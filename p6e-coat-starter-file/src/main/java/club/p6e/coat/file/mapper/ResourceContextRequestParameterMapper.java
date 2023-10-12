@@ -48,17 +48,17 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         context.putAll(queryParams);
         final List<String> nodes = queryParams.get(NODE_PARAMETER_NAME);
         final List<String> paths = queryParams.get(PATH_PARAMETER_NAME);
-        if (nodes != null && !nodes.isEmpty()) {
+        if (nodes != null && !nodes.isEmpty() && nodes.get(0) != null) {
             context.setNode(nodes.get(0));
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). " +
+                    "fun execute(ServerRequest request). -> URL PARAM " +
                             "<" + NODE_PARAMETER_NAME + "> Request parameter is null",
-                    "<" + NODE_PARAMETER_NAME + "> Request parameter is null"
+                    "URL PARAM <" + NODE_PARAMETER_NAME + "> Request parameter is null"
             ));
         }
-        if (paths != null && !paths.isEmpty()) {
+        if (paths != null && !paths.isEmpty() && paths.get(0) != null) {
             final String pc = paths.get(0);
             final String path = FileUtil.path(pc);
             final String name = FileUtil.name(pc);
@@ -66,8 +66,8 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
                 return Mono.error(new ParameterException(
                         this.getClass(),
                         "fun execute(ServerRequest request). " +
-                                "<" + PATH_PARAMETER_NAME + "> Request parameter format error",
-                        "<" + PATH_PARAMETER_NAME + "> Request parameter format error"
+                                "URL PARAM <" + PATH_PARAMETER_NAME + "> Request parameter format error",
+                        "URL PARAM <" + PATH_PARAMETER_NAME + "> Request parameter format error"
                 ));
             } else {
                 context.setPath(FileUtil.composePath(path, name));
@@ -75,9 +75,8 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). " +
-                            "<" + PATH_PARAMETER_NAME + "> Request parameter is null",
-                    "<" + PATH_PARAMETER_NAME + "> Request parameter is null"
+                    "fun execute(ServerRequest request). -> Request parameter is null",
+                    "Request parameter is null"
             ));
         }
         return Mono.just(context);

@@ -83,8 +83,8 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         if (!MediaType.MULTIPART_FORM_DATA.isCompatibleWith(mediaType)) {
             return Mono.error(new MediaTypeException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). Unrecognized media type ["
-                            + mediaType + "], need media type [" + MediaType.MULTIPART_FORM_DATA + "]!!",
+                    "fun execute(ServerRequest request). -> Unrecognized media " +
+                            "type [" + mediaType + "], need media type [" + MediaType.MULTIPART_FORM_DATA + "]!!",
                     "Unrecognized media type [" + mediaType + "], need media type [" + MediaType.MULTIPART_FORM_DATA + "]")
             );
         }
@@ -108,18 +108,17 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                                 // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
+                                        "fun execute(ServerRequest request). -> FROM DATA " +
                                                 "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int",
-                                        "<" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
+                                        "FROM DATA <" + FORM_DATA_PARAMETER_ID + "> Request parameter type is not int"
                                 ));
                             }
                         } else {
                             // 如果没有读取到了 FORM DATA ID 请求参数那么就抛出参数异常
                             return Mono.error(new ParameterException(
                                     this.getClass(),
-                                    "fun execute(ServerRequest request). " +
-                                            "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null",
-                                    "<" + FORM_DATA_PARAMETER_ID + "> Request parameter is null"
+                                    "fun execute(ServerRequest request). Request parameter is null",
+                                    "Request parameter is null"
                             ));
                         }
                     }
@@ -133,18 +132,17 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                                 // 类型转换异常，请求参数不是我们需要的类型，抛出参数类型异常
                                 return Mono.error(new ParameterException(
                                         this.getClass(),
-                                        "fun execute(ServerRequest request). " +
+                                        "fun execute(ServerRequest request). -> FROM DATA " +
                                                 "<" + FORM_DATA_PARAMETER_INDEX + "> Request parameter type is not int",
-                                        "<" + FORM_DATA_PARAMETER_INDEX + "> Request parameter type is not int"
+                                        "FROM DATA <" + FORM_DATA_PARAMETER_INDEX + "> Request parameter type is not int"
                                 ));
                             }
                         } else {
                             // 如果没有读取到了 FORM DATA INDEX 请求参数那么就抛出参数异常
                             return Mono.error(new ParameterException(
                                     this.getClass(),
-                                    "fun execute(ServerRequest request). " +
-                                            "<" + FORM_DATA_PARAMETER_INDEX + "> Request parameter is null",
-                                    "<" + FORM_DATA_PARAMETER_INDEX + "> Request parameter is null"
+                                    "fun execute(ServerRequest request). Request parameter is null",
+                                    "Request parameter is null"
                             ));
                         }
                     }
@@ -157,8 +155,8 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                             // 如果没有读取到了 FORM DATA SIGNATURE 请求参数那么就抛出参数异常
                             return Mono.error(new ParameterException(
                                     this.getClass(),
-                                    "fun execute(ServerRequest request).",
-                                    "<" + FORM_DATA_PARAMETER_SIGNATURE + "> Request parameter is null"
+                                    "fun execute(ServerRequest request). Request parameter is null",
+                                    "Request parameter is null"
                             ));
                         }
                     }
@@ -170,9 +168,8 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
                         // 如果没有读取到了 FORM DATA 文件请求参数那么就抛出参数异常
                         return Mono.error(new ParameterException(
                                 this.getClass(),
-                                "fun execute(ServerRequest request). " +
-                                        "<" + FORM_DATA_PARAMETER_FILE + "> Request parameter is null",
-                                "<" + FORM_DATA_PARAMETER_FILE + "> Request parameter is null"
+                                "fun execute(ServerRequest request). Request parameter is null",
+                                " Request parameter is null"
                         ));
                     }
                     return Mono.just(newContext);
@@ -199,7 +196,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         if (context.getId() == null) {
             // 读取 URL ID 请求参数
             final List<String> ids = queryParams.get(URL_PARAMETER_ID);
-            if (ids != null && !ids.isEmpty()) {
+            if (ids != null && !ids.isEmpty() && ids.get(0) != null) {
                 try {
                     // 如果读取到了 URL ID 那么就写入到上下文对象中
                     context.setId(Integer.valueOf(ids.get(0)));
@@ -220,7 +217,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         // 读取 URL INDEX 请求参数
         final MultiValueMap<String, String> queryParams = request.exchange().getRequest().getQueryParams();
         final List<String> indexes = queryParams.get(URL_PARAMETER_INDEX);
-        if (indexes != null && !indexes.isEmpty()) {
+        if (indexes != null && !indexes.isEmpty() && indexes.get(0) != null) {
             try {
                 // 如果读取到了 URL INDEX 那么就写入到上下文对象中
                 context.setIndex(Integer.valueOf(indexes.get(0)));
@@ -240,7 +237,7 @@ public class SliceUploadContextRequestParameterMapper extends RequestParameterMa
         final MultiValueMap<String, String> queryParams = request.exchange().getRequest().getQueryParams();
         // 读取 URL SIGNATURE 请求参数
         final List<String> signatures = queryParams.get(URL_PARAMETER_SIGNATURE);
-        if (signatures != null && !signatures.isEmpty()) {
+        if (signatures != null && !signatures.isEmpty() && signatures.get(0) != null) {
             // 如果读取到了 URL SIGNATURE 那么就写入到上下文对象中
             context.setSignature(signatures.get(0));
         }

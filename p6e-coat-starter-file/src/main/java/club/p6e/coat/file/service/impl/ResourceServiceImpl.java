@@ -32,6 +32,7 @@ public class ResourceServiceImpl implements ResourceService {
      * 配置文件对象
      */
     private final Properties properties;
+
     /**
      * 文件读写服务对象
      */
@@ -50,7 +51,6 @@ public class ResourceServiceImpl implements ResourceService {
 
     @Override
     public Mono<FileReadActuator> execute(ResourceContext context) {
-        System.out.println(context);
         final Properties.Resource resource = properties.getResources().get(context.getNode());
         if (resource == null) {
             return Mono.error(new ResourceNodeException(
@@ -65,10 +65,11 @@ public class ResourceServiceImpl implements ResourceService {
             final Map<String, MediaType> suffixes = resource.getSuffixes();
             if (suffixes.get(suffix) != null) {
                 final MediaType mediaType = suffixes.get(suffix);
-                final Map<String, Object> data = new HashMap<>();
-                data.putAll(resource.getExtend());
-                data.putAll(context);
-                return fileReadWriteService.read(resource.getType(), resource.getPath(), path, mediaType, data);
+                final Map<String, Object> extend = new HashMap<>() {{
+                    putAll(resource.getExtend());
+                    putAll(context);
+                }};
+                return fileReadWriteService.read(resource.getType(), resource.getPath(), path, mediaType, extend);
             } else {
                 return Mono.error(new ResourceNodeException(
                         this.getClass(),
