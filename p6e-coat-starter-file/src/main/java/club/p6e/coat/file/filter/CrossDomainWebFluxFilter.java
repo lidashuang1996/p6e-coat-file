@@ -47,19 +47,13 @@ public class CrossDomainWebFluxFilter implements WebFilter {
      * 跨域配置 ACCESS_CONTROL_ALLOW_HEADERS
      */
     private static final String[] ACCESS_CONTROL_ALLOW_HEADERS = new String[]{
-            "Authorization",
-            "Content-Type",
-            "Depth",
-            "User-Agent",
-            "X-File-Size",
-            "X-Requested-With",
-            "X-Requested-By",
-            "If-Modified-Since",
-            "X-File-Name",
-            "X-File-Type",
-            "Cache-Control",
+            "Accept",
+            "Host",
             "Origin",
-            "Client"
+            "Referer",
+            "User-Agent",
+            "Content-Type",
+            "Authorization"
     };
 
     /**
