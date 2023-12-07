@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
- * 下载操作处理程序函数
+ * 下载文件-处理函数
  *
  * @author lidashuang
  * @version 1.0
@@ -35,20 +35,20 @@ import java.util.List;
 public class DownloadHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 下载切面对象
+     * 下载文件切面对象
      */
     private final DownloadAspect aspect;
 
     /**
-     * 下载服务对象
+     * 下载文件服务对象
      */
     private final DownloadService service;
 
     /**
      * 构造函数初始化
      *
-     * @param aspect  下载切面对象
-     * @param service 下载服务对象
+     * @param aspect  下载文件切面对象
+     * @param service 下载文件服务对象
      */
     public DownloadHandlerFunction(DownloadAspect aspect, DownloadService service) {
         this.aspect = aspect;
@@ -61,10 +61,12 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
         return
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, DownloadContext.class)
-                        // 执行下载操作之前的切点
+                        // 执行下载文件之前的切点
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
+                                // 执行下载文件
                                 .execute(new DownloadContext(m))
+                                // 执行下载文件之后的切点
                                 .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
                         .flatMap(fra -> {
                             final String fc;
@@ -76,8 +78,8 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                                 return Mono.error(new FileException(
                                         this.getClass(),
                                         "fun handle(ServerRequest request). -> " +
-                                                "Download file name parsing error.",
-                                        "Download file name parsing error"
+                                                "Download file name parsing exception.",
+                                        "Download file name parsing exception"
                                 ));
                             }
                             if (!ranges.isEmpty()) {

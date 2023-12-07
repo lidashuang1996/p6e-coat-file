@@ -121,7 +121,7 @@ public class Properties implements Serializable {
         /**
          * 资源类型
          */
-        private String type;
+        private String type = "DISK";
 
         /**
          * 基础的文件路径
@@ -145,7 +145,7 @@ public class Properties implements Serializable {
         /**
          * 资源类型
          */
-        private String type;
+        private String type = "DISK";
 
         /**
          * 基础的文件路径
@@ -171,7 +171,7 @@ public class Properties implements Serializable {
         /**
          * 资源类型
          */
-        private String type;
+        private String type = "DISK";
 
         /**
          * 基础的文件路径
@@ -195,7 +195,7 @@ public class Properties implements Serializable {
         /**
          * 基础的文件路径
          */
-        private String path = "/opt/data/slice";
+        private String path = "/opt/data/p6e_file/slice";
 
         /**
          * 允许上传的文件大小的最大值

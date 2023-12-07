@@ -14,7 +14,7 @@ import java.util.Map;
 
 /**
  * 分片上传服务
- * 步骤1: 打开上传操作
+ * 步骤1: 打开分片上传操作
  *
  * @author lidashuang
  * @version 1.0

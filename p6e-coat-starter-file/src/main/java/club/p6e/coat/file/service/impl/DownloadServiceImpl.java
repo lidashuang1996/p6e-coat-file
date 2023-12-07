@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 下载服务
+ * 下载文件服务
  *
  * @author lidashuang
  * @version 1.0
@@ -66,8 +66,13 @@ public class DownloadServiceImpl implements DownloadService {
                 putAll(download.getExtend());
                 putAll(context);
             }};
-            return fileReadWriteService.read(download.getType(),
-                    download.getPath(), context.getPath(), MediaType.APPLICATION_OCTET_STREAM, extend);
+            return fileReadWriteService.read(
+                    download.getType(),
+                    download.getPath(),
+                    context.getPath(),
+                    MediaType.APPLICATION_OCTET_STREAM,
+                    extend
+            );
         }
     }
 }

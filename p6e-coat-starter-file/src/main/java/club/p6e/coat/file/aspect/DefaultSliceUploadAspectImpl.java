@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 /**
- * 简单（小文件）上传操作的切面（钩子）的默认实现
+ * 分片上传-切面（钩子）
  *
  * @author lidashuang
  * @version 1.0
@@ -27,6 +27,7 @@ public class DefaultSliceUploadAspectImpl implements SliceUploadAspect {
     @Override
     public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
         // 对返回的结果数据进行处理
+        // 从而屏蔽一些不想给前端用户显示的数据
         final Object id = result.get("id");
         final Object fid = result.get("fid");
         final Object name = result.get("name");

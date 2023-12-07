@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * 分片上传操作处理程序函数
+ * 分片上传-处理函数
  *
  * @author lidashuang
  * @version 1.0
@@ -52,14 +52,14 @@ public class SliceUploadHandlerFunction extends AspectHandlerFunction implements
         return
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, SliceUploadContext.class)
-                        // 执行分片上传操作之前的切点
+                        // 执行分片上传之前的切点
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> {
                             final SliceUploadContext context = new SliceUploadContext(m);
                             return
-                                    // 执行分片上传服务
+                                    // 执行分片上传
                                     service.execute(context)
-                                            // 执行分片上传操作之后的切点
+                                            // 执行分片上传之后的切点
                                             .flatMap(r -> after(aspect, context, r));
                         })
                         // 结果返回

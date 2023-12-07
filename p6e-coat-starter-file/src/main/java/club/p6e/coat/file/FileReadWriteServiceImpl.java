@@ -80,8 +80,8 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
 
     @Override
     public Mono<FileReadActuator> read(
-            String type, String base, String path, MediaType mediaType, Map<String, Object> extend
-    ) {
+            String type, String base, String path,
+            MediaType mediaType, Map<String, Object> extend) {
         final File file = new File(FileUtil.composePath(base, path));
         return Mono.just(new FileReadActuator() {
 

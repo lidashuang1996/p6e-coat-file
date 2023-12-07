@@ -32,11 +32,12 @@ public class RefererWebFluxFilter implements WebFilter {
     /**
      * 错误的结果对象
      */
-    private static final String ERROR_RESULT_CONTENT = JsonUtil.toJson(AspectHandlerFunction.ResultContext.build(
-            HttpStatus.FORBIDDEN.value(),
-            HttpStatus.FORBIDDEN.getReasonPhrase(),
-            "Referer is not allowed."
-    ));
+    private static final String ERROR_RESULT_CONTENT = JsonUtil.toJson(
+            AspectHandlerFunction.ResultContext.build(
+                    HttpStatus.FORBIDDEN.value(),
+                    HttpStatus.FORBIDDEN.getReasonPhrase(),
+                    "Referer is not allowed."
+            ));
 
     /**
      * HOST 配置

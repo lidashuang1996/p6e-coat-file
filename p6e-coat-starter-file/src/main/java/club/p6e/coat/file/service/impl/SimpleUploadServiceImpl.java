@@ -55,6 +55,7 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
     /**
      * 构造方法初始化
      *
+     * @param properties           配置文件对象
      * @param repository           上传存储库对象
      * @param fileReadWriteService 文件读取写入服务对象
      */
@@ -90,20 +91,20 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
                     "<name> Request parameter format error")
             );
         }
-        final UploadModel createUploadModel = new UploadModel();
+        final UploadModel pum = new UploadModel();
         final Object operator = context.get("operator");
         if (operator instanceof final String content) {
-            createUploadModel.setOwner(content);
-            createUploadModel.setOperator(content);
+            pum.setOwner(content);
+            pum.setOperator(content);
         }
-        createUploadModel.setName(name);
-        createUploadModel.setSource(SOURCE);
+        pum.setName(name);
+        pum.setSource(SOURCE);
         final Map<String, Object> extend = new HashMap<>() {{
             putAll(upload.getExtend());
             putAll(context);
         }};
         return repository
-                .create(createUploadModel)
+                .create(pum)
                 .flatMap(m -> fileReadWriteService
                         .write(name, extend, new FileWriteActuator() {
                             @Override
@@ -122,12 +123,12 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
                             }
                         })
                         .map(fam -> {
-                            final UploadModel updateUploadModel = new UploadModel();
-                            updateUploadModel.setId(m.getId());
-                            updateUploadModel.setSize(fam.getLength());
-                            updateUploadModel.setStorageType(fam.getType());
-                            updateUploadModel.setStorageLocation(fam.getPath());
-                            return updateUploadModel;
+                            final UploadModel rum = new UploadModel();
+                            rum.setId(m.getId());
+                            rum.setSize(fam.getLength());
+                            rum.setStorageType(fam.getType());
+                            rum.setStorageLocation(fam.getPath());
+                            return rum;
                         }))
                 .flatMap(m -> Mono.just(m)
                         .flatMap(l -> repository.closeLock(m.getId()))

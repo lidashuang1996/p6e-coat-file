@@ -2,17 +2,14 @@ package club.p6e.coat.file.task;
 
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.model.UploadChunkModel;
-import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadChunkRepository;
 import club.p6e.coat.file.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -62,7 +59,7 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
         final int s = ThreadLocalRandom.current().nextInt(2, 6);
         final int f = ThreadLocalRandom.current().nextInt(0, 60);
         final int m = ThreadLocalRandom.current().nextInt(0, 60);
-        return m + " " + f + " " + s + " * * *";
+        return m + " " + f + " " + s + " * * ?";
     }
 
     @Override

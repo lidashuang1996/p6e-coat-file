@@ -15,7 +15,7 @@ public interface ResourceService {
     /**
      * 执行资源查看操作
      *
-     * @param context 资源上下文对象
+     * @param context 资源查看上下文对象
      * @return 结果对象
      */
     public Mono<FileReadActuator> execute(ResourceContext context);

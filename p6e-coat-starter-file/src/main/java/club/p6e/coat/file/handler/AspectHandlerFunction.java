@@ -8,7 +8,9 @@ import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 切面处理函数
@@ -101,9 +103,31 @@ public class AspectHandlerFunction {
     }
 
     /**
-     * 操作人的标记名称
+     * 需要清除的请求参数名称
      */
-    private static final String OPERATOR = "operator";
+    private static final List<String> CLEAN_REQUEST_PARAM_NAME = new CopyOnWriteArrayList<>(
+            List.of("operator")
+    );
+
+    /**
+     * 添加需要清除的请求参数名称
+     *
+     * @param name 请求参数名称
+     */
+    @SuppressWarnings("ALL")
+    private static void addCleanRequestParamName(String name) {
+        CLEAN_REQUEST_PARAM_NAME.add(name);
+    }
+
+    /**
+     * 移除需要清除的请求参数名称
+     *
+     * @param name 请求参数名称
+     */
+    @SuppressWarnings("ALL")
+    private static void removeCleanRequestParamName(String name) {
+        CLEAN_REQUEST_PARAM_NAME.remove(name);
+    }
 
     /**
      * 运行之前的切点处理
@@ -116,19 +140,19 @@ public class AspectHandlerFunction {
         if (data == null) {
             data = new HashMap<>(0);
         }
-        final Map<String, Object> finalData = data;
-        if (data.get(OPERATOR) != null) {
-            data.remove(OPERATOR);
+        final Map<String, Object> bData = data;
+        for (final String name : CLEAN_REQUEST_PARAM_NAME) {
+            data.remove(name);
         }
-        return aspect.before(finalData)
+        return aspect.before(bData)
                 .flatMap(b -> {
                     if (b) {
-                        return Mono.just(finalData);
+                        return Mono.just(bData);
                     } else {
                         return Mono.error(new AspectContactException(
                                 this.getClass(),
                                 "fun before() -> Action before intercept return false/error",
-                                "Action before intercept return error"
+                                "Aspect handler before intercept return false/error"
                         ));
                     }
                 });
@@ -149,17 +173,17 @@ public class AspectHandlerFunction {
         if (result == null) {
             result = new HashMap<>(0);
         }
-        final Map<String, Object> finalData = data;
-        final Map<String, Object> finalResult = result;
-        return aspect.after(finalData, finalResult)
+        final Map<String, Object> aData = data;
+        final Map<String, Object> aResult = result;
+        return aspect.after(aData, aResult)
                 .flatMap(b -> {
                     if (b) {
-                        return Mono.just(finalResult);
+                        return Mono.just(aResult);
                     } else {
                         return Mono.error(new AspectContactException(
                                 this.getClass(),
                                 "fun after() -> Action after intercept return false/error",
-                                "Action after intercept return error"
+                                "Aspect handler after intercept return false/error"
                         ));
                     }
                 });

@@ -101,7 +101,6 @@ public class BaseRouterFunction implements RouterFunction<ServerResponse> {
      * @param throwable 异常对象
      * @return Mono<ServerResponse> ServerResponse 对象
      */
-    @SuppressWarnings("ALL")
     private Mono<ServerResponse> throwableHandler(Throwable throwable) {
         LOGGER.error(throwable.getMessage());
         throwable = CustomException.transformation(throwable);

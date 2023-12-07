@@ -5,7 +5,7 @@ import reactor.core.publisher.Mono;
 import java.util.Map;
 
 /**
- * 资源查看操作的切面（钩子）
+ * 资源查看-切面（钩子）
  *
  * @author lidashuang
  * @version 1.0

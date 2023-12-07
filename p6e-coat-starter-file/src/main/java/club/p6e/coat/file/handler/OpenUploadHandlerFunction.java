@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
 /**
- * 打开上传操作处理程序函数
+ * 打开分片上传-处理函数
  *
  * @author lidashuang
  * @version 1.0
@@ -26,20 +26,20 @@ import reactor.core.publisher.Mono;
 public class OpenUploadHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 打开上传切面对象
+     * 打开分片上传切面对象
      */
     private final OpenUploadAspect aspect;
 
     /**
-     * 打开上传服务对象
+     * 打开分片上传服务对象
      */
     private final OpenUploadService service;
 
     /**
      * 构造函数初始化
      *
-     * @param aspect  打开上传切面对象
-     * @param service 打开上传服务对象
+     * @param aspect  打开分片上传切面对象
+     * @param service 打开分片上传服务对象
      */
     public OpenUploadHandlerFunction(OpenUploadAspect aspect, OpenUploadService service) {
         this.aspect = aspect;
@@ -52,14 +52,14 @@ public class OpenUploadHandlerFunction extends AspectHandlerFunction implements 
         return
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, OpenUploadContext.class)
-                        // 执行打开上传操作之前的切点
+                        // 执行打开分片上传之前的切点
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> {
                             final OpenUploadContext context = new OpenUploadContext(m);
                             return
-                                    // 执行打开上传服务
+                                    // 执行打开分片上传
                                     service.execute(context)
-                                            // 执行打开上传操作之后的切点
+                                            // 执行打开分片上传之后的切点
                                             .flatMap(r -> after(aspect, context, r));
                         })
                         // 结果返回

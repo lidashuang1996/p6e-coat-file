@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * 关闭上传请求参数映射器
+ * 关闭分片上传请求参数映射器
  *
  * @author lidashuang
  * @version 1.0

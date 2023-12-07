@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 下载上下文对象
+ * 下载文件上下文对象
  *
  * @author lidashuang
  * @version 1.0

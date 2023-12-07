@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * 分片上传服务
- * 步骤3: 关闭上传操作
+ * 步骤3: 关闭分片上传操作
  *
  * @author lidashuang
  * @version 1.0
@@ -58,9 +58,9 @@ public class CloseUploadServiceImpl implements CloseUploadService {
             UploadRepository repository,
             FileReadWriteService fileReadWriteService
     ) {
-        this.fileReadWriteService = fileReadWriteService;
-        this.repository = repository;
         this.properties = properties;
+        this.repository = repository;
+        this.fileReadWriteService = fileReadWriteService;
     }
 
     @Override

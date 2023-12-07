@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 /**
- * 资源操作处理程序函数
+ * 资源查看-处理函数
  *
  * @author lidashuang
  * @version 1.0
@@ -32,20 +32,20 @@ import java.util.List;
 public class ResourceHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 下载切面对象
+     * 资源查看切面对象
      */
     private final ResourceAspect aspect;
 
     /**
-     * 下载服务对象
+     * 资源查看服务对象
      */
     private final ResourceService service;
 
     /**
      * 构造函数初始化
      *
-     * @param aspect  下载切面对象
-     * @param service 下载服务对象
+     * @param aspect  资源查看切面对象
+     * @param service 资源查看服务对象
      */
     public ResourceHandlerFunction(ResourceAspect aspect, ResourceService service) {
         this.aspect = aspect;
@@ -58,10 +58,12 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
         return
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, ResourceContext.class)
-                        // 执行下载操作之前的切点
+                        // 执行资源查看之前的切点
                         .flatMap(c -> before(aspect, c))
                         .flatMap(m -> service
+                                // 执行资源查看
                                 .execute(new ResourceContext(m))
+                                // 执行资源查看之后的切点
                                 .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
                         // 结果返回
                         .flatMap(fra -> {

@@ -69,7 +69,13 @@ public class ResourceServiceImpl implements ResourceService {
                     putAll(resource.getExtend());
                     putAll(context);
                 }};
-                return fileReadWriteService.read(resource.getType(), resource.getPath(), path, mediaType, extend);
+                return fileReadWriteService.read(
+                        resource.getType(),
+                        resource.getPath(),
+                        path,
+                        mediaType,
+                        extend
+                );
             } else {
                 return Mono.error(new ResourceNodeException(
                         this.getClass(),

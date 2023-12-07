@@ -10,8 +10,6 @@ import club.p6e.coat.file.repository.UploadRepository;
 import club.p6e.coat.file.service.SliceUploadService;
 import club.p6e.coat.file.utils.FileUtil;
 import club.p6e.coat.file.utils.SpringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -33,11 +31,6 @@ import java.util.Map;
         ignored = SliceUploadServiceImpl.class
 )
 public class SliceUploadServiceImpl implements SliceUploadService {
-
-    /**
-     * 日志对象
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(SliceUploadServiceImpl.class);
 
     /**
      * 配置文件对象
@@ -65,6 +58,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
      * @param properties            配置文件对象
      * @param uploadRepository      上传存储库对象
      * @param uploadChunkRepository 上传块存储库对象
+     * @param fileSignatureService  文件签名服务对象
      */
     public SliceUploadServiceImpl(
             Properties properties,
