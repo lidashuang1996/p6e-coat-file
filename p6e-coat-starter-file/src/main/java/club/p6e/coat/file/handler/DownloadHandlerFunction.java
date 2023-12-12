@@ -35,24 +35,24 @@ import java.util.List;
 public class DownloadHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 下载文件切面对象
-     */
-    private final DownloadAspect aspect;
-
-    /**
      * 下载文件服务对象
      */
     private final DownloadService service;
 
     /**
+     * 下载文件切面列表对象
+     */
+    private final List<DownloadAspect> aspects;
+
+    /**
      * 构造函数初始化
      *
-     * @param aspect  下载文件切面对象
      * @param service 下载文件服务对象
+     * @param aspects 下载文件切面列表对象
      */
-    public DownloadHandlerFunction(DownloadAspect aspect, DownloadService service) {
-        this.aspect = aspect;
+    public DownloadHandlerFunction(DownloadService service, List<DownloadAspect> aspects) {
         this.service = service;
+        this.aspects = aspects;
     }
 
     @NonNull
@@ -62,12 +62,12 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, DownloadContext.class)
                         // 执行下载文件之前的切点
-                        .flatMap(c -> before(aspect, c))
+                        .flatMap(c -> before(aspects, c))
                         .flatMap(m -> service
                                 // 执行下载文件
                                 .execute(new DownloadContext(m))
                                 // 执行下载文件之后的切点
-                                .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
+                                .flatMap(fra -> after(aspects, m, null).map(r -> fra)))
                         .flatMap(fra -> {
                             final String fc;
                             final List<HttpRange> ranges = request.headers().range();

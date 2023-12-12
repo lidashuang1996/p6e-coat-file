@@ -20,6 +20,11 @@ import java.util.Map;
 public class DefaultSliceUploadAspectImpl implements SliceUploadAspect {
 
     @Override
+    public int order() {
+        return 0;
+    }
+
+    @Override
     public Mono<Boolean> before(Map<String, Object> data) {
         return Mono.just(true);
     }

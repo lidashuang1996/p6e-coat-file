@@ -1,6 +1,5 @@
 package club.p6e.coat.file.aspect;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -13,11 +12,12 @@ import java.util.Map;
  * @version 1.0
  */
 @Component
-@ConditionalOnMissingBean(
-        value = OpenUploadAspect.class,
-        ignored = DefaultOpenUploadAspectImpl.class
-)
 public class DefaultOpenUploadAspectImpl implements OpenUploadAspect {
+
+    @Override
+    public int order() {
+        return 0;
+    }
 
     @Override
     public Mono<Boolean> before(Map<String, Object> data) {

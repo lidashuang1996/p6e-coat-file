@@ -1,0 +1,77 @@
+{
+  "groups": [],
+  "properties": [
+    {
+      "name": "p6e.coat.file.host.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether request host validation is enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "p6e.coat.file.host.list",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Request host validation whitelist.",
+      "defaultValue": []
+    },
+    {
+      "name": "p6e.coat.file.referer.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether request referer validation is enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "p6e.coat.file.referer.list",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Request referer validation whitelist.",
+      "defaultValue": []
+    },
+    {
+      "name": "p6e.coat.file.cross-domain.enable",
+      "type": "java.lang.Boolean",
+      "description": "Whether request cross domain support is enabled.",
+      "defaultValue": false
+    },
+    {
+      "name": "p6e.coat.file.slice-upload.path",
+      "type": "java.lang.String",
+      "description": "File storage path for chunked upload.",
+      "defaultValue": "/opt/data/p6e/file/slice"
+    },
+    {
+      "name": "p6e.coat.file.slice-upload.max-size",
+      "type": "java.lang.Long",
+      "description": "The maximum length of file chunks for chunked upload.",
+      "defaultValue": 20971520
+    },
+    {
+      "name": "p6e.coat.file.uploads",
+      "type": "java.util.Map<java.lang.String, club.p6e.coat.file.Properties.Upload>",
+      "deprecation": {
+        "u-type": "Resource type",
+        "u-path": "Resource path",
+        "u-extend": "Extend parameter configuration"
+      },
+      "defaultValue": {}
+    },
+    {
+      "name": "p6e.coat.file.resources",
+      "type": "java.util.Map<java.lang.String, club.p6e.coat.file.Properties.Resource>",
+      "deprecations": {
+        "r-type": "Resource type",
+        "r-path": "Resource path",
+        "r-extend": "Extend parameter configuration"
+      },
+      "defaultValue": {}
+    },
+    {
+      "name": "p6e.coat.file.downloads",
+      "type": "java.util.Map<java.lang.String, club.p6e.coat.file.Properties.Download>",
+      "deprecations": {
+        "d-type": "Resource type",
+        "d-path": "Resource path",
+        "d-extend": "Extend parameter configuration"
+      },
+      "defaultValue": {}
+    }
+  ]
+}

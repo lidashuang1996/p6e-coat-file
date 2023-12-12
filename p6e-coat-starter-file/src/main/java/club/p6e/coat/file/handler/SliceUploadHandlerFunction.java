@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 /**
  * 分片上传-处理函数
  *
@@ -26,24 +28,24 @@ import reactor.core.publisher.Mono;
 public class SliceUploadHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 分片上传切面对象
-     */
-    private final SliceUploadAspect aspect;
-
-    /**
      * 分片上传服务对象
      */
     private final SliceUploadService service;
 
     /**
+     * 分片上传切面列表对象
+     */
+    private final List<SliceUploadAspect> aspects;
+
+    /**
      * 构造函数初始化
      *
-     * @param aspect  分片上传切面对象
      * @param service 分片上传服务对象
+     * @param aspects 分片上传切面列表对象
      */
-    public SliceUploadHandlerFunction(SliceUploadAspect aspect, SliceUploadService service) {
-        this.aspect = aspect;
+    public SliceUploadHandlerFunction(SliceUploadService service, List<SliceUploadAspect> aspects) {
         this.service = service;
+        this.aspects = aspects;
     }
 
     @NonNull
@@ -53,14 +55,14 @@ public class SliceUploadHandlerFunction extends AspectHandlerFunction implements
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, SliceUploadContext.class)
                         // 执行分片上传之前的切点
-                        .flatMap(c -> before(aspect, c))
+                        .flatMap(c -> before(aspects, c))
                         .flatMap(m -> {
                             final SliceUploadContext context = new SliceUploadContext(m);
                             return
                                     // 执行分片上传
                                     service.execute(context)
                                             // 执行分片上传之后的切点
-                                            .flatMap(r -> after(aspect, context, r));
+                                            .flatMap(r -> after(aspects, context, r));
                         })
                         // 结果返回
                         .flatMap(r -> ServerResponse.ok().bodyValue(ResultContext.build(r)));

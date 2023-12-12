@@ -2,6 +2,7 @@ package club.p6e.coat.file;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,10 @@ import java.util.Map;
 @Data
 @Component
 @Accessors(chain = true)
+@ConditionalOnMissingBean(
+        value = Properties.class,
+        ignored = Properties.class
+)
 @ConfigurationProperties(prefix = "p6e.coat.file")
 public class Properties implements Serializable {
 
@@ -195,7 +200,7 @@ public class Properties implements Serializable {
         /**
          * 基础的文件路径
          */
-        private String path = "/opt/data/p6e_file/slice";
+        private String path = "/opt/data/p6e/file/slice";
 
         /**
          * 允许上传的文件大小的最大值

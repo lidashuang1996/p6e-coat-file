@@ -7,9 +7,7 @@ import lombok.experimental.Accessors;
 import reactor.core.publisher.Mono;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -132,61 +130,96 @@ public class AspectHandlerFunction {
     /**
      * 运行之前的切点处理
      *
-     * @param aspect 切面对象
-     * @param data   参数对象
+     * @param aspects 切面列表对象
+     * @param data    参数对象
      * @return 结果对象
      */
-    public Mono<Map<String, Object>> before(Aspect aspect, Map<String, Object> data) {
+    public Mono<Map<String, Object>> before(List<? extends Aspect> aspects, Map<String, Object> data) {
+        aspects.sort(Comparator.comparingInt(Aspect::order));
         if (data == null) {
             data = new HashMap<>(0);
         }
-        final Map<String, Object> bData = data;
         for (final String name : CLEAN_REQUEST_PARAM_NAME) {
             data.remove(name);
         }
-        return aspect.before(bData)
-                .flatMap(b -> {
-                    if (b) {
-                        return Mono.just(bData);
-                    } else {
-                        return Mono.error(new AspectContactException(
-                                this.getClass(),
-                                "fun before() -> Action before intercept return false/error",
-                                "Aspect handler before intercept return false/error"
-                        ));
-                    }
-                });
+        return before(aspects, data, 0);
+    }
+
+    /**
+     * 运行之前的切点处理
+     *
+     * @param aspects 切面列表对象
+     * @param data    参数对象
+     * @param index   执行的当前序号
+     * @return 结果对象
+     */
+    private Mono<Map<String, Object>> before(List<? extends Aspect> aspects, Map<String, Object> data, int index) {
+        if (index < aspects.size()) {
+            return aspects
+                    .get(index)
+                    .before(data)
+                    .flatMap(b -> {
+                        if (b) {
+                            return before(aspects, data, index + 1);
+                        } else {
+                            return Mono.error(new AspectContactException(
+                                    this.getClass(),
+                                    "fun before() -> Action before intercept return false/error",
+                                    "Aspect handler before intercept return false/error"
+                            ));
+                        }
+                    });
+        } else {
+            return Mono.just(data);
+        }
     }
 
     /**
      * 运行之后的切点处理
      *
-     * @param aspect 切面对象
-     * @param data   参数对象
-     * @param result 返回对象
+     * @param aspects 切面列表对象
+     * @param data    参数对象
+     * @param result  返回对象
      * @return 结果对象
      */
-    public Mono<Map<String, Object>> after(Aspect aspect, Map<String, Object> data, Map<String, Object> result) {
+    public Mono<Map<String, Object>> after(List<? extends Aspect> aspects, Map<String, Object> data, Map<String, Object> result) {
+        aspects.sort(Comparator.comparingInt(Aspect::order));
         if (data == null) {
             data = new HashMap<>(0);
         }
         if (result == null) {
             result = new HashMap<>(0);
         }
-        final Map<String, Object> aData = data;
-        final Map<String, Object> aResult = result;
-        return aspect.after(aData, aResult)
-                .flatMap(b -> {
-                    if (b) {
-                        return Mono.just(aResult);
-                    } else {
-                        return Mono.error(new AspectContactException(
-                                this.getClass(),
-                                "fun after() -> Action after intercept return false/error",
-                                "Aspect handler after intercept return false/error"
-                        ));
-                    }
-                });
+        return after(aspects, data, result, 0);
     }
 
+    /**
+     * 运行之后的切点处理
+     *
+     * @param aspects 切面列表对象
+     * @param data    参数对象
+     * @param result  返回对象
+     * @param index   执行的当前序号
+     * @return 结果对象
+     */
+    public Mono<Map<String, Object>> after(List<? extends Aspect> aspects, Map<String, Object> data, Map<String, Object> result, int index) {
+        if (index < aspects.size()) {
+            return aspects
+                    .get(index)
+                    .after(data, result)
+                    .flatMap(b -> {
+                        if (b) {
+                            return after(aspects, data, result, index + 1);
+                        } else {
+                            return Mono.error(new AspectContactException(
+                                    this.getClass(),
+                                    "fun after() -> Action after intercept return false/error",
+                                    "Aspect handler after intercept return false/error"
+                            ));
+                        }
+                    });
+        } else {
+            return Mono.just(result);
+        }
+    }
 }

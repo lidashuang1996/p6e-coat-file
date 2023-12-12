@@ -13,6 +13,13 @@ import java.util.Map;
 public interface Aspect {
 
     /**
+     * 排序
+     *
+     * @return 排序序号
+     */
+    public int order();
+
+    /**
      * 在操作之前
      *
      * @param data 参数对象

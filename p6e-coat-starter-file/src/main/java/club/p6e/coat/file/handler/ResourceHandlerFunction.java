@@ -32,24 +32,24 @@ import java.util.List;
 public class ResourceHandlerFunction extends AspectHandlerFunction implements HandlerFunction<ServerResponse> {
 
     /**
-     * 资源查看切面对象
-     */
-    private final ResourceAspect aspect;
-
-    /**
      * 资源查看服务对象
      */
     private final ResourceService service;
 
     /**
+     * 资源查看切面列表对象
+     */
+    private final List<ResourceAspect> aspects;
+
+    /**
      * 构造函数初始化
      *
-     * @param aspect  资源查看切面对象
      * @param service 资源查看服务对象
+     * @param aspects 资源查看切面列表对象
      */
-    public ResourceHandlerFunction(ResourceAspect aspect, ResourceService service) {
-        this.aspect = aspect;
+    public ResourceHandlerFunction(ResourceService service, List<ResourceAspect> aspects) {
         this.service = service;
+        this.aspects = aspects;
     }
 
     @NonNull
@@ -59,12 +59,12 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
                 // 通过请求参数映射器获取上下文对象
                 RequestParameterMapper.execute(request, ResourceContext.class)
                         // 执行资源查看之前的切点
-                        .flatMap(c -> before(aspect, c))
+                        .flatMap(c -> before(aspects, c))
                         .flatMap(m -> service
                                 // 执行资源查看
                                 .execute(new ResourceContext(m))
                                 // 执行资源查看之后的切点
-                                .flatMap(fra -> after(aspect, m, null).map(r -> fra)))
+                                .flatMap(fra -> after(aspects, m, null).map(r -> fra)))
                         // 结果返回
                         .flatMap(fra -> {
                             final MediaType mediaType = fra.mediaType();
