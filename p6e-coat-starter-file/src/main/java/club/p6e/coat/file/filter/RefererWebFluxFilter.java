@@ -15,6 +15,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * 跨域过滤器
@@ -30,6 +31,16 @@ import java.nio.charset.StandardCharsets;
 public class RefererWebFluxFilter implements WebFilter {
 
     /**
+     * REFERER
+     */
+    private static final String REFERER_HEADER = "Referer";
+
+    /**
+     * REFERER 通用内容
+     */
+    private static final String REFERER_HEADER_GENERAL_CONTENT = "*";
+
+    /**
      * 错误的结果对象
      */
     private static final String ERROR_RESULT_CONTENT = JsonUtil.toJson(
@@ -40,39 +51,42 @@ public class RefererWebFluxFilter implements WebFilter {
             ));
 
     /**
-     * HOST 配置
+     * 配置文件对象
      */
-    private final Properties.Referer config;
+    private final Properties properties;
 
     /**
      * 构造方法初始化
      *
-     * @param properties 配置
+     * @param properties 配置文件对象
      */
     public RefererWebFluxFilter(Properties properties) {
-        this.config = properties.getReferer();
+        this.properties = properties;
     }
 
     @NonNull
     @Override
     public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
-        if (config.isEnable()) {
-            final ServerHttpRequest request = exchange.getRequest();
-            final ServerHttpResponse response = exchange.getResponse();
-            final String referer = request.getHeaders().getFirst("Referer");
-            if (referer != null) {
-                for (final String item : config.getList()) {
-                    if ("*".equals(item) || referer.startsWith(item)) {
-                        return chain.filter(exchange);
-                    }
+        if (!properties.getReferer().isEnable()) {
+            return chain.filter(exchange);
+        }
+
+        final ServerHttpRequest request = exchange.getRequest();
+        final ServerHttpResponse response = exchange.getResponse();
+
+        final List<String> refererList = request.getHeaders().get(REFERER_HEADER);
+        if (refererList != null && !refererList.isEmpty()) {
+            final String r = refererList.get(0);
+            final String referer = r == null ? "" : r;
+            for (final String item : properties.getReferer().getWhiteList()) {
+                if (REFERER_HEADER_GENERAL_CONTENT.equals(item) || referer.startsWith(item)) {
+                    return chain.filter(exchange);
                 }
             }
-            response.setStatusCode(HttpStatus.FORBIDDEN);
-            return response.writeWith(
-                    Mono.just(response.bufferFactory()
-                            .wrap(ERROR_RESULT_CONTENT.getBytes(StandardCharsets.UTF_8)))
-            );
         }
-        return chain.filter(exchange);
+
+        response.setStatusCode(HttpStatus.FORBIDDEN);
+        return response.writeWith(Mono.just(response.bufferFactory()
+                .wrap(ERROR_RESULT_CONTENT.getBytes(StandardCharsets.UTF_8))));
     }
 }

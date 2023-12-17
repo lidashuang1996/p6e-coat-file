@@ -30,9 +30,9 @@ import java.util.Map;
 public class Properties implements Serializable {
 
     /**
-     * HOST 配置
+     * 版本号
      */
-    private Host host = new Host();
+    private String version = "unknown";
 
     /**
      * REFERER 配置
@@ -65,39 +65,6 @@ public class Properties implements Serializable {
     private Map<String, Download> downloads = new HashMap<>();
 
     /**
-     * 跨域配置
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class CrossDomain implements Serializable {
-
-        /**
-         * 是否启用
-         */
-        private boolean enable = false;
-
-    }
-
-    /**
-     * HOST 配置
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class Host implements Serializable {
-
-        /**
-         * 是否启用
-         */
-        private boolean enable = false;
-
-        /**
-         * HOST 配置
-         */
-        private List<String> list = new ArrayList<>();
-
-    }
-
-    /**
      * REFERER 配置
      */
     @Data
@@ -110,9 +77,28 @@ public class Properties implements Serializable {
         private boolean enable = false;
 
         /**
-         * REFERER 配置
+         * 白名单配置
          */
-        private List<String> list = new ArrayList<>();
+        private List<String> whiteList = new ArrayList<>();
+
+    }
+
+    /**
+     * 跨域配置
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class CrossDomain implements Serializable {
+
+        /**
+         * 是否启用
+         */
+        private boolean enable = false;
+
+        /**
+         * 白名单配置
+         */
+        private List<String> whiteList = new ArrayList<>();
 
     }
 

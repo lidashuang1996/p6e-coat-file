@@ -61,7 +61,7 @@ public class AutoConfigureImportSelector implements ImportSelector {
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("p6e coat file auto configure import selector error.", e);
+            LOGGER.error("p6e coat file auto configure import selector error", e);
         }
         return register.toArray(new String[0]);
     }

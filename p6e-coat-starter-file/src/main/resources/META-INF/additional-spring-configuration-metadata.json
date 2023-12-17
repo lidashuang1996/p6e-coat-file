@@ -2,27 +2,15 @@
   "groups": [],
   "properties": [
     {
-      "name": "p6e.coat.file.host.enabled",
-      "type": "java.lang.Boolean",
-      "description": "Whether request host validation is enabled.",
-      "defaultValue": false
-    },
-    {
-      "name": "p6e.coat.file.host.list",
-      "type": "java.util.List<java.lang.String>",
-      "description": "Request host validation whitelist.",
-      "defaultValue": []
-    },
-    {
       "name": "p6e.coat.file.referer.enabled",
       "type": "java.lang.Boolean",
       "description": "Whether request referer validation is enabled.",
       "defaultValue": false
     },
     {
-      "name": "p6e.coat.file.referer.list",
+      "name": "p6e.coat.file.referer.white-list",
       "type": "java.util.List<java.lang.String>",
-      "description": "Request referer validation whitelist.",
+      "description": "Request referer validation white list.",
       "defaultValue": []
     },
     {
@@ -30,6 +18,12 @@
       "type": "java.lang.Boolean",
       "description": "Whether request cross domain support is enabled.",
       "defaultValue": false
+    },
+    {
+      "name": "p6e.coat.file.cross-domain.white-list",
+      "type": "java.util.List<java.lang.String>",
+      "description": "Whether request cross domain validation white list.",
+      "defaultValue": []
     },
     {
       "name": "p6e.coat.file.slice-upload.path",
