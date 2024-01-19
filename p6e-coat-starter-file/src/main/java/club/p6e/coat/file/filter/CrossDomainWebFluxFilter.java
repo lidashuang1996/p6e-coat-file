@@ -1,8 +1,6 @@
 package club.p6e.coat.file.filter;
 
 import club.p6e.coat.file.Properties;
-import club.p6e.coat.file.handler.AspectHandlerFunction;
-import club.p6e.coat.file.utils.JsonUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -73,12 +71,8 @@ public class CrossDomainWebFluxFilter implements WebFilter {
     /**
      * 错误结果内容
      */
-    private static final String ERROR_RESULT_CONTENT = JsonUtil.toJson(
-            AspectHandlerFunction.ResultContext.build(
-                    HttpStatus.FORBIDDEN.value(),
-                    HttpStatus.FORBIDDEN.getReasonPhrase(),
-                    "Host is not allowed."
-            ));
+    private static final String ERROR_RESULT_CONTENT =
+            "{\"code\":403,\"message\":\"Forbidden\",\"data\":\"Cross Domain Exception\"}";
 
     /**
      * 配置文件对象

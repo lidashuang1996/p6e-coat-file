@@ -12,9 +12,18 @@ import java.io.File;
  */
 public interface FileWriteActuator {
 
+    /**
+     * 类型
+     *
+     * @return 类型
+     */
     public String type();
 
-
+    /**
+     * 路径
+     *
+     * @return 路径
+     */
     public String path();
 
     /**

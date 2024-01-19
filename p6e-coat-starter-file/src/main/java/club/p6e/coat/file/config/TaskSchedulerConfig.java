@@ -1,4 +1,4 @@
-package club.p6e.coat.file.task;
+package club.p6e.coat.file.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Configuration
-public class FileTaskSchedulerConfig {
+public class TaskSchedulerConfig {
 
-    @Bean("club.p6e.coat.file.task.TaskScheduler")
+    @Bean
     public TaskScheduler injectTaskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
         taskScheduler.setThreadNamePrefix("P6E-COAT-TASK-SCHEDULER-");

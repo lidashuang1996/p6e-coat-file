@@ -1,8 +1,6 @@
 package club.p6e.coat.file.filter;
 
 import club.p6e.coat.file.Properties;
-import club.p6e.coat.file.handler.AspectHandlerFunction;
-import club.p6e.coat.file.utils.JsonUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -41,14 +39,10 @@ public class RefererWebFluxFilter implements WebFilter {
     private static final String REFERER_HEADER_GENERAL_CONTENT = "*";
 
     /**
-     * 错误的结果对象
+     * 错误结果内容
      */
-    private static final String ERROR_RESULT_CONTENT = JsonUtil.toJson(
-            AspectHandlerFunction.ResultContext.build(
-                    HttpStatus.FORBIDDEN.value(),
-                    HttpStatus.FORBIDDEN.getReasonPhrase(),
-                    "Referer is not allowed."
-            ));
+    private static final String ERROR_RESULT_CONTENT =
+            "{\"code\":403,\"message\":\"Forbidden\",\"data\":\"Referer Exception\"}";
 
     /**
      * 配置文件对象
@@ -70,10 +64,8 @@ public class RefererWebFluxFilter implements WebFilter {
         if (!properties.getReferer().isEnable()) {
             return chain.filter(exchange);
         }
-
         final ServerHttpRequest request = exchange.getRequest();
         final ServerHttpResponse response = exchange.getResponse();
-
         final List<String> refererList = request.getHeaders().get(REFERER_HEADER);
         if (refererList != null && !refererList.isEmpty()) {
             final String r = refererList.get(0);
@@ -84,7 +76,6 @@ public class RefererWebFluxFilter implements WebFilter {
                 }
             }
         }
-
         response.setStatusCode(HttpStatus.FORBIDDEN);
         return response.writeWith(Mono.just(response.bufferFactory()
                 .wrap(ERROR_RESULT_CONTENT.getBytes(StandardCharsets.UTF_8))));
