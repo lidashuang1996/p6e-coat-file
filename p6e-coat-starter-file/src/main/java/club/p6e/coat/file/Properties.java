@@ -8,9 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,16 +33,6 @@ public class Properties implements Serializable {
     private String version = "unknown";
 
     /**
-     * REFERER 配置
-     */
-    private Referer referer = new Referer();
-
-    /**
-     * 跨域配置
-     */
-    private CrossDomain crossDomain = new CrossDomain();
-
-    /**
      * 分片上传配置
      */
     private SliceUpload sliceUpload = new SliceUpload();
@@ -63,44 +51,6 @@ public class Properties implements Serializable {
      * 下载配置
      */
     private Map<String, Download> downloads = new HashMap<>();
-
-    /**
-     * REFERER 配置
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class Referer implements Serializable {
-
-        /**
-         * 是否启用
-         */
-        private boolean enable = false;
-
-        /**
-         * 白名单配置
-         */
-        private List<String> whiteList = new ArrayList<>();
-
-    }
-
-    /**
-     * 跨域配置
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class CrossDomain implements Serializable {
-
-        /**
-         * 是否启用
-         */
-        private boolean enable = false;
-
-        /**
-         * 白名单配置
-         */
-        private List<String> whiteList = new ArrayList<>();
-
-    }
 
     /**
      * 下载

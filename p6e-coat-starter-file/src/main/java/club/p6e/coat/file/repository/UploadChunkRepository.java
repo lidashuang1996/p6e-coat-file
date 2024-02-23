@@ -92,7 +92,7 @@ public class UploadChunkRepository {
     public Mono<Long> deleteByFid(int fid) {
         return Mono
                 .from(this.factory.create())
-                .flatMap(connection -> Mono.from(connection.createStatement(DELETE_SQL).bind("$fid", fid).execute()))
+                .flatMap(connection -> Mono.from(connection.createStatement(DELETE_SQL).bind("$1", fid).execute()))
                 .flatMap(r -> Mono.from(r.getRowsUpdated()));
     }
 
@@ -102,16 +102,16 @@ public class UploadChunkRepository {
             "    id, fid, name, size, date, operator  " +
             "  FROM p6e_file_upload_chunk  " +
             "  WHERE  " +
-            "  id > $id date < $localDateTime" +
-            "  ORDER BY id AES;";
+            "  id > $1 date < $2  " +
+            "  ORDER BY id AES;  ";
 
     public Mono<UploadChunkModel> select(Integer id, LocalDateTime localDateTime) {
         return Mono
                 .from(this.factory.create())
                 .flatMap(connection -> {
                     final Statement statement = connection.createStatement(SELECT_SQL);
-                    statement.bind("$id", id);
-                    statement.bind("$localDateTime", localDateTime);
+                    statement.bind("$1", id);
+                    statement.bind("$2", localDateTime);
                     return Mono.from(statement.execute());
                 })
                 .flatMap(r -> Mono.from(r.map((row, metadata) -> {

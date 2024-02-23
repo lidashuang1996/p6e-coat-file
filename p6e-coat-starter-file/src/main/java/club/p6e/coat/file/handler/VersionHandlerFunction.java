@@ -37,7 +37,7 @@ public class VersionHandlerFunction implements HandlerFunction<ServerResponse> {
     @NonNull
     @Override
     public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
-        return ServerResponse.ok().bodyValue(properties.getVersion());
+        return ServerResponse.ok().bodyValue("club.p6e.coat.file@version" + properties.getVersion());
     }
 
 }

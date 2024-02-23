@@ -47,10 +47,6 @@ public class ApplicationListener implements CommandLineRunner {
         LOGGER.info("=============================================================");
         LOGGER.info("--------- " + Properties.class + " ---------");
         LOGGER.info("version: " + properties.getVersion());
-        LOGGER.info("referer.enable: " + properties.getReferer().isEnable());
-        LOGGER.info("referer.white-list: " + properties.getReferer().getWhiteList());
-        LOGGER.info("cross-domain.enable: " + properties.getCrossDomain().isEnable());
-        LOGGER.info("cross-domain.white-list: " + properties.getCrossDomain().getWhiteList());
         LOGGER.info("slice-upload.path: " + properties.getSliceUpload().getPath());
         LOGGER.info("slice-upload.max-size: " + properties.getSliceUpload().getMaxSize());
         for (final String key : properties.getUploads().keySet()) {

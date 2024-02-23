@@ -26,7 +26,7 @@ public class VersionRouterFunction extends BaseRouterFunction implements RouterF
      * @param handlerFunction 处理器函数对象
      */
     public VersionRouterFunction(VersionHandlerFunction handlerFunction) {
-        super(RequestPredicates.GET("/__version__"), handlerFunction);
+        super(RequestPredicates.GET("/version"), handlerFunction);
     }
 
 }
