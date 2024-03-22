@@ -2,7 +2,7 @@ package club.p6e.coat.file.handler;
 
 import club.p6e.coat.file.aspect.DownloadAspect;
 import club.p6e.coat.file.context.DownloadContext;
-import club.p6e.coat.file.error.FileException;
+import club.p6e.coat.common.error.FileException;
 import club.p6e.coat.file.mapper.RequestParameterMapper;
 import club.p6e.coat.file.service.DownloadService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

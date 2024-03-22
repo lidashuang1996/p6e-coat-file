@@ -3,7 +3,7 @@ package club.p6e.coat.file.task;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.model.UploadChunkModel;
 import club.p6e.coat.file.repository.UploadChunkRepository;
-import club.p6e.coat.file.utils.FileUtil;
+import club.p6e.coat.common.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

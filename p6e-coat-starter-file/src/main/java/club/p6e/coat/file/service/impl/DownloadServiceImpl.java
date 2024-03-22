@@ -4,7 +4,7 @@ import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.service.DownloadService;
 import club.p6e.coat.file.context.DownloadContext;
-import club.p6e.coat.file.error.DownloadNodeException;
+import club.p6e.coat.common.error.DownloadNodeException;
 import club.p6e.coat.file.Properties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.MediaType;

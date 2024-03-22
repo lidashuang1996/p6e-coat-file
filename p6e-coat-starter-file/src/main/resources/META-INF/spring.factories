@@ -7,15 +7,12 @@ club.p6e.coat.file.aspect.DefaultResourceAspectImpl,\
 club.p6e.coat.file.aspect.DefaultSimpleUploadAspectImpl,\
 club.p6e.coat.file.aspect.DefaultSliceUploadAspectImpl,\
 club.p6e.coat.file.config.TaskSchedulerConfig,\
-club.p6e.coat.file.filter.RefererWebFluxFilter,\
-club.p6e.coat.file.filter.CrossDomainWebFluxFilter,\
 club.p6e.coat.file.handler.CloseUploadHandlerFunction,\
 club.p6e.coat.file.handler.DownloadHandlerFunction,\
 club.p6e.coat.file.handler.OpenUploadHandlerFunction,\
 club.p6e.coat.file.handler.ResourceHandlerFunction,\
 club.p6e.coat.file.handler.SimpleUploadHandlerFunction,\
 club.p6e.coat.file.handler.SliceUploadHandlerFunction,\
-club.p6e.coat.file.handler.VersionHandlerFunction,\
 club.p6e.coat.file.mapper.CloseUploadContextRequestParameterMapper,\
 club.p6e.coat.file.mapper.DownloadContextRequestParameterMapper,\
 club.p6e.coat.file.mapper.OpenUploadContextRequestParameterMapper,\
@@ -31,7 +28,6 @@ club.p6e.coat.file.router.OpenUploadRouterFunction,\
 club.p6e.coat.file.router.ResourceRouterFunction,\
 club.p6e.coat.file.router.SimpleUploadRouterFunction,\
 club.p6e.coat.file.router.SliceUploadRouterFunction,\
-club.p6e.coat.file.router.VersionRouterFunction,\
 club.p6e.coat.file.service.impl.CloseUploadServiceImpl,\
 club.p6e.coat.file.service.impl.DownloadServiceImpl,\
 club.p6e.coat.file.service.impl.OpenUploadServiceImpl,\
@@ -40,7 +36,6 @@ club.p6e.coat.file.service.impl.SimpleUploadServiceImpl,\
 club.p6e.coat.file.service.impl.SliceUploadServiceImpl,\
 club.p6e.coat.file.task.FileSliceCleanTask,\
 club.p6e.coat.file.task.FileSliceCleanTaskStrategyServiceImpl,\
-club.p6e.coat.file.ApplicationListener,\
 club.p6e.coat.file.FileReadWriteServiceImpl,\
 club.p6e.coat.file.FileSignatureServiceImpl,\
 club.p6e.coat.file.FolderStorageLocationPathServiceImpl,\

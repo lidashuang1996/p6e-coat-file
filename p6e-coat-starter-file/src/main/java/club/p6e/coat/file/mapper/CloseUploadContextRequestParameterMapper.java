@@ -1,6 +1,6 @@
 package club.p6e.coat.file.mapper;
 
-import club.p6e.coat.file.error.ParameterException;
+import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.file.context.CloseUploadContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.MediaType;

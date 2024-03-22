@@ -1,8 +1,8 @@
 package club.p6e.coat.file.mapper;
 
-import club.p6e.coat.file.error.ParameterException;
+import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.file.context.DownloadContext;
-import club.p6e.coat.file.utils.FileUtil;
+import club.p6e.coat.common.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;

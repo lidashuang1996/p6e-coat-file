@@ -28,11 +28,6 @@ import java.util.Map;
 public class Properties implements Serializable {
 
     /**
-     * 版本号
-     */
-    private String version = "unknown";
-
-    /**
      * 分片上传配置
      */
     private SliceUpload sliceUpload = new SliceUpload();

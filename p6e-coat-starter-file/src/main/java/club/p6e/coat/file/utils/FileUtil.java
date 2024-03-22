@@ -1,6 +1,7 @@
 package club.p6e.coat.file.utils;
 
-import club.p6e.coat.file.error.FileException;
+import club.p6e.coat.common.utils.GeneratorUtil;
+import club.p6e.coat.common.error.FileException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileUrlResource;

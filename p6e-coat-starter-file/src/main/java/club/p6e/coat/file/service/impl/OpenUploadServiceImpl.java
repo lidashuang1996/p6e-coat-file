@@ -1,11 +1,11 @@
 package club.p6e.coat.file.service.impl;
 
-import club.p6e.coat.file.error.ParameterException;
+import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.file.service.OpenUploadService;
 import club.p6e.coat.file.context.OpenUploadContext;
 import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadRepository;
-import club.p6e.coat.file.utils.FileUtil;
+import club.p6e.coat.common.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

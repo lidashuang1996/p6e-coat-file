@@ -1,6 +1,6 @@
 package club.p6e.coat.file.repository;
 
-import club.p6e.coat.file.error.DataBaseException;
+import club.p6e.coat.common.error.DataBaseException;
 import club.p6e.coat.file.model.UploadChunkModel;
 import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;

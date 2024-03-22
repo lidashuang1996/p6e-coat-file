@@ -1,7 +1,7 @@
 package club.p6e.coat.file;
 
-import club.p6e.coat.file.error.FileException;
-import club.p6e.coat.file.utils.FileUtil;
+import club.p6e.coat.common.error.FileException;
+import club.p6e.coat.common.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;

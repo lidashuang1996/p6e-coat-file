@@ -1,6 +1,6 @@
 package club.p6e.coat.file.router;
 
-import club.p6e.coat.file.error.CustomException;
+import club.p6e.coat.common.error.CustomException;
 import club.p6e.coat.file.handler.AspectHandlerFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

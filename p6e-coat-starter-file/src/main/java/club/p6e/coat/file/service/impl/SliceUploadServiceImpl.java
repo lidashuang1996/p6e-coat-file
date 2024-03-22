@@ -2,14 +2,14 @@ package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.file.FileSignatureService;
 import club.p6e.coat.file.context.SliceUploadContext;
-import club.p6e.coat.file.error.FileException;
+import club.p6e.coat.common.error.FileException;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.model.UploadChunkModel;
 import club.p6e.coat.file.repository.UploadChunkRepository;
 import club.p6e.coat.file.repository.UploadRepository;
 import club.p6e.coat.file.service.SliceUploadService;
-import club.p6e.coat.file.utils.FileUtil;
-import club.p6e.coat.file.utils.SpringUtil;
+import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.common.utils.SpringUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
