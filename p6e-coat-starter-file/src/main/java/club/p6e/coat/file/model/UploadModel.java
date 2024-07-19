@@ -22,13 +22,14 @@ public class UploadModel implements Serializable {
     private String name;
     private Long size;
     private String source;
+    private String owner;
     private String storageType;
     private String storageLocation;
-    private String owner;
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
-    private String operator;
     private Integer lock;
+    private String creator;
+    private String modifier;
+    private LocalDateTime creationDateTime;
+    private LocalDateTime modificationDateTime;
     private Integer version;
 
     public Map<String, Object> toMap() {

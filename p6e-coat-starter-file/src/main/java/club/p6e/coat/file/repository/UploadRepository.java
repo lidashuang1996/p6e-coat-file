@@ -1,5 +1,6 @@
 package club.p6e.coat.file.repository;
 
+import club.p6e.DatabaseConfig;
 import club.p6e.coat.common.error.FileException;
 import club.p6e.coat.common.error.DataBaseException;
 import club.p6e.coat.file.model.UploadModel;
@@ -44,22 +45,52 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String SELECT_SQL = "" +
-            "  SELECT id, name, size, source, storage_type, storage_location, owner, create_date, update_date, operator, lock, version  " +
-            "  FROM p6e_file_upload  " +
-            "  WHERE id = $1;";
+            "  SELECT " +
+            "       \"id\",    " +
+            "       \"name\",    " +
+            "       \"size\",    " +
+            "       \"source\",    " +
+            "       \"owner\",    " +
+            "       \"storage_type\",    " +
+            "       \"storage_location\",    " +
+            "       \"lock\",    " +
+            "       \"creator\",    " +
+            "       \"modifier\",    " +
+            "       \"creation_date_time\",    " +
+            "       \"modification_date_time\",    " +
+            "       \"version\"    " +
+            "  FROM    " +
+            "       \"public\".\"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "  WHERE    " +
+            "       id = $1    " +
+            "    ;    ";
 
     @SuppressWarnings("ALL")
     private static final String CREATE_SQL = "" +
             "  INSERT INTO " +
-            "    p6e_file_upload  " +
-            "    (name, size, source, storage_type, storage_location, owner, create_date, update_date, operator, lock, version)  " +
-            "  VALUES" +
-            "    ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) " +
-            "  RETURNING id;";
+            "       \"public\".\"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "    (    " +
+            "       \"name\",    " +
+            "       \"size\",    " +
+            "       \"source\",    " +
+            "       \"owner\",    " +
+            "       \"storage_type\",    " +
+            "       \"storage_location\",    " +
+            "       \"lock\",    " +
+            "       \"creator\",    " +
+            "       \"modifier\",    " +
+            "       \"creation_date_time\",    " +
+            "       \"modification_date_time\",    " +
+            "       \"version\"    " +
+            "    )    " +
+            "    VALUES    " +
+            "        (    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12    )    " +
+            "    RETURNING id    " +
+            "    ;    ";
 
     @SuppressWarnings("ALL")
     private static final String DELETE_SQL = "" +
-            "DELETE FROM p6e_file_upload WHERE id = $1;";
+            "    DELETE FROM \"public\".\"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\" WHERE id = $1;    ";
 
     @SuppressWarnings("ALL")
     private static final String ACQUIRE_LOCK_SQL = "" +
@@ -75,9 +106,16 @@ public class UploadRepository {
 
     @SuppressWarnings("ALL")
     private static final String CLOSE_LOCK_SQL = "" +
-            "  UPDATE p6e_file_upload  " +
-            "  SET lock = $1, version = $2, update_date = $3 " +
-            "  WHERE id = $4 AND version = $5;";
+            "   UPDATE    " +
+            "       \"public\".\"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "   SET    " +
+            "       \"lock\" = $1,    " +
+            "       \"version\" = $2,    " +
+            "       \"modification_date_time\" = $3    " +
+            "   WHERE " +
+            "       \"id\" = $4    " +
+            "       AND  \"version\" = $5    " +
+            "    ;    ";
 
     /**
      * R2dbcEntityTemplate 对象
@@ -104,8 +142,11 @@ public class UploadRepository {
         if (model.getOwner() == null) {
             model.setOwner("sys");
         }
-        if (model.getOperator() == null) {
-            model.setOperator("sys");
+        if (model.getCreator() == null) {
+            model.setCreator("sys");
+        }
+        if (model.getModifier() == null) {
+            model.setModifier("sys");
         }
         if (model.getStorageType() == null) {
             model.setStorageType("");
@@ -116,8 +157,8 @@ public class UploadRepository {
         model.setId(null);
         model.setLock(0);
         model.setVersion(0);
-        model.setCreateDate(LocalDateTime.now());
-        model.setUpdateDate(LocalDateTime.now());
+        model.setCreationDateTime(LocalDateTime.now());
+        model.setModificationDateTime(LocalDateTime.now());
         return Mono.usingWhen(
                 this.factory.create(),
                 connection -> {
@@ -125,17 +166,18 @@ public class UploadRepository {
                     statement.bind("$1", model.getName());
                     statement.bind("$2", model.getSize());
                     statement.bind("$3", model.getSource());
-                    statement.bind("$4", model.getStorageType());
-                    statement.bind("$5", model.getStorageLocation());
-                    statement.bind("$6", model.getOwner());
-                    statement.bind("$7", model.getCreateDate());
-                    statement.bind("$8", model.getUpdateDate());
-                    statement.bind("$9", model.getOperator());
-                    statement.bind("$10", model.getLock());
-                    statement.bind("$11", model.getVersion());
-                    return Mono.from(statement.execute())
-                            .flatMap(r -> Mono.from(r.map(
-                                    (row, metadata) -> row.get("id", Integer.class))))
+                    statement.bind("$4", model.getOwner());
+                    statement.bind("$5", model.getStorageType());
+                    statement.bind("$6", model.getStorageLocation());
+                    statement.bind("$7", model.getLock());
+                    statement.bind("$8", model.getCreator());
+                    statement.bind("$9", model.getModifier());
+                    statement.bind("$10", model.getCreationDateTime());
+                    statement.bind("$11", model.getModificationDateTime());
+                    statement.bind("$12", model.getVersion());
+                    return Mono
+                            .from(statement.execute())
+                            .flatMap(r -> Mono.from(r.map((row, metadata) -> row.get("id", Integer.class))))
                             .flatMap(this::findById);
                 },
                 Connection::close
@@ -156,7 +198,6 @@ public class UploadRepository {
         return acquireLock(id, 0);
     }
 
-
     /**
      * 修改数据--锁增加 1
      *
@@ -166,8 +207,7 @@ public class UploadRepository {
      */
     private Mono<Long> acquireLock(int id, int retry) {
         if (retry == 0) {
-            return acquireLock0(id)
-                    .flatMap(c -> c > 0 ? Mono.just(c) : acquireLock(id, (retry + 1)));
+            return acquireLock0(id).flatMap(c -> c > 0 ? Mono.just(c) : acquireLock(id, (retry + 1)));
         } else if (retry <= MAX_RETRY_COUNT) {
             final long interval = RETRY_INTERVAL_DATE * ThreadLocalRandom.current().nextInt(100) / 100;
             return Mono.delay(Duration.of(interval, ChronoUnit.MILLIS))
@@ -176,8 +216,8 @@ public class UploadRepository {
         } else {
             return Mono.error(new DataBaseException(
                     this.getClass(),
-                    "fun acquireLock(int id, int retry). -> Exceeding maximum retry count error",
-                    "Exceeding maximum retry count error"
+                    "fun acquireLock(int id, int retry). -> [ acquireLock(...) exceptions exceeding the latest retry count. ]",
+                    "acquireLock(...) exceptions exceeding the latest retry count."
             ));
         }
     }
@@ -192,36 +232,33 @@ public class UploadRepository {
         return this.findById(id)
                 .switchIfEmpty(Mono.error(new DataBaseException(
                         this.getClass(),
-                        "fun acquireLock0(int id). -> Get data error",
-                        "Get data error"
+                        "fun acquireLock0(int id). -> [ acquireLock0(...) get data does not exist exception. ]",
+                        "acquireLock0(...) get data does not exist exception."
                 )))
                 .flatMap(m -> {
-                    m.setUpdateDate(LocalDateTime.now());
+                    m.setModificationDateTime(LocalDateTime.now());
                     if (m.getLock() >= 0) {
                         return Mono.usingWhen(
                                 this.factory.create(),
                                 connection -> {
                                     final Statement statement = connection.createStatement(ACQUIRE_LOCK_SQL);
-                                    statement.bind("$1", m.getLock() + 1);
-                                    statement.bind("$2", m.getVersion() + 1);
-                                    statement.bind("$3", m.getUpdateDate());
                                     statement.bind("$4", m.getId());
                                     statement.bind("$5", m.getVersion());
-                                    return Mono
-                                            .from(statement.execute())
-                                            .flatMap(result -> Mono.from(result.getRowsUpdated()));
-                                },
-                                Connection::close
+                                    statement.bind("$1", (m.getLock() + 1));
+                                    statement.bind("$2", (m.getVersion() + 1));
+                                    statement.bind("$3", m.getModificationDateTime());
+                                    return Mono.from(statement.execute()).flatMap(result -> Mono.from(result.getRowsUpdated()));
+                                }, Connection::close
                         ).switchIfEmpty(Mono.error(new DataBaseException(
                                 this.getClass(),
-                                "fun acquireLock0(int id). -> Update data error",
-                                "Update data error"
+                                "fun acquireLock0(int id). -> [ releaseLock0(...) data base exception. ]",
+                                "releaseLock0(...) data base exception."
                         )));
                     } else {
                         return Mono.error(new FileException(
                                 this.getClass(),
-                                "fun acquireLock0(int id). The file sharding request has been closed.",
-                                "The file sharding request has been closed"
+                                "fun acquireLock0(int id). [ releaseLock0(...) incomplete sharding exceptions. ]",
+                                "releaseLock0(...) incomplete sharding exceptions."
                         ));
                     }
                 });
@@ -246,18 +283,18 @@ public class UploadRepository {
      */
     private Mono<Long> releaseLock(int id, int retry) {
         if (retry == 0) {
-            return releaseLock0(id)
-                    .flatMap(c -> c > 0 ? Mono.just(c) : releaseLock(id, (retry + 1)));
+            return releaseLock0(id).flatMap(c -> c > 0 ? Mono.just(c) : releaseLock(id, (retry + 1)));
         } else if (retry <= MAX_RETRY_COUNT) {
             final long interval = RETRY_INTERVAL_DATE * ThreadLocalRandom.current().nextInt(100) / 100;
-            return Mono.delay(Duration.of(interval, ChronoUnit.MILLIS))
+            return Mono
+                    .delay(Duration.of(interval, ChronoUnit.MILLIS))
                     .flatMap(r -> releaseLock0(id))
                     .flatMap(c -> c > 0 ? Mono.just(c) : releaseLock(id, (retry + 1)));
         } else {
             return Mono.error(new DataBaseException(
                     this.getClass(),
-                    "fun releaseLock(int id, int retry). -> Exceeding maximum retry count error",
-                    "Exceeding maximum retry count error"
+                    "fun releaseLock(int id, int retry). -> [ releaseLock(...) exceptions exceeding the latest retry count. ]",
+                    "exceptions exceeding the latest retry count."
             ));
         }
     }
@@ -272,35 +309,33 @@ public class UploadRepository {
         return this.findById(id)
                 .switchIfEmpty(Mono.error(new DataBaseException(
                         this.getClass(),
-                        "fun releaseLock0(int id). -> Get data error",
-                        "Get data error"
+                        "fun releaseLock0(int id). -> [ releaseLock0(...) get data does not exist exception. ]",
+                        "releaseLock0(...) get data does not exist exception."
                 )))
                 .flatMap(m -> {
-                    m.setUpdateDate(LocalDateTime.now());
+                    m.setModificationDateTime(LocalDateTime.now());
                     if (m.getLock() >= 0) {
                         return Mono.usingWhen(
                                 this.factory.create(),
                                 connection -> {
                                     final Statement statement = connection.createStatement(RELEASE_LOCK_SQL);
                                     statement.bind("$4", id);
-                                    statement.bind("$1", m.getLock() - 1);
-                                    statement.bind("$3", m.getUpdateDate());
-                                    statement.bind("$2", m.getVersion() + 1);
                                     statement.bind("$5", m.getVersion());
-                                    return Mono.from(statement.execute())
-                                            .flatMap(r -> Mono.from(r.getRowsUpdated()));
-                                },
-                                Connection::close
+                                    statement.bind("$1", (m.getLock() - 1));
+                                    statement.bind("$2", (m.getVersion() + 1));
+                                    statement.bind("$3", m.getModificationDateTime());
+                                    return Mono.from(statement.execute()).flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                }, Connection::close
                         ).switchIfEmpty(Mono.error(new DataBaseException(
                                 this.getClass(),
-                                "fun releaseLock0(int id). -> Update data error",
-                                "Update data error"
+                                "fun releaseLock0(int id). -> [ releaseLock0(...) data base exception. ]",
+                                "releaseLock0(...) data base exception."
                         )));
                     } else {
                         return Mono.error(new FileException(
                                 this.getClass(),
-                                "fun acquireLock0(int id). The file sharding request has been closed.",
-                                "The file sharding request has been closed"
+                                "fun releaseLock0(int id). -> [ releaseLock0(...) incomplete sharding exceptions. ]",
+                                "releaseLock0(...) incomplete sharding exceptions."
                         ));
                     }
                 });
@@ -325,18 +360,18 @@ public class UploadRepository {
      */
     private Mono<Long> closeLock(int id, int retry) {
         if (retry == 0) {
-            return closeLock0(id)
-                    .flatMap(c -> c > 0 ? Mono.just(c) : closeLock(id, (retry + 1)));
+            return closeLock0(id).flatMap(c -> c > 0 ? Mono.just(c) : closeLock(id, (retry + 1)));
         } else if (retry <= MAX_RETRY_COUNT) {
             final long interval = RETRY_INTERVAL_DATE * ThreadLocalRandom.current().nextInt(100) / 100;
-            return Mono.delay(Duration.of(interval, ChronoUnit.MILLIS))
+            return Mono
+                    .delay(Duration.of(interval, ChronoUnit.MILLIS))
                     .flatMap(t -> closeLock0(id))
                     .flatMap(c -> c > 0 ? Mono.just(c) : closeLock(id, (retry + 1)));
         } else {
             return Mono.error(new DataBaseException(
                     this.getClass(),
-                    "fun closeLock(int id, int retry). -> Exceeding maximum retry count error",
-                    "Exceeding maximum retry count error"
+                    "fun closeLock(int id, int retry). -> [ closeLock0(...) exceptions exceeding the latest retry count. ]",
+                    "exceptions exceeding the latest retry count."
             ));
         }
     }
@@ -351,22 +386,22 @@ public class UploadRepository {
         return this.findById(id)
                 .switchIfEmpty(Mono.error(new DataBaseException(
                         this.getClass(),
-                        "fun releaseLock0(int id). -> Get data error",
-                        "Get data error"
+                        "fun releaseLock0(int id). -> [ closeLock0(...) get data does not exist exception. ]",
+                        "closeLock0(...) get data does not exist exception."
                 )))
                 .flatMap(m -> {
-                    m.setUpdateDate(LocalDateTime.now());
+                    m.setModificationDateTime(LocalDateTime.now());
                     if (m.getLock() == -1) {
                         return Mono.error(new FileException(
                                 this.getClass(),
-                                "fun closeLock0(int id). -> It is already in a closed state and cannot be closed again.",
-                                "It is already in a closed state and cannot be closed again"
+                                "fun closeLock0(int id). -> [ closeLock0(...) It is already in a closed state and cannot be closed again. ]",
+                                "closeLock0(...) it is already in a closed state and cannot be closed again."
                         ));
                     } else if (m.getLock() > 0) {
                         return Mono.error(new FileException(
                                 this.getClass(),
-                                "fun closeLock0(int id). -> There are upload sharding requests and cannot be closed.",
-                                "There are upload sharding requests and cannot be closed"
+                                "fun closeLock0(int id). -> [ loseLock0(...) there are upload sharding requests and cannot be closed. ]",
+                                "closeLock0(...) there are upload sharding requests and cannot be closed."
                         ));
                     } else if (m.getLock() == 0) {
                         return Mono.usingWhen(
@@ -374,18 +409,16 @@ public class UploadRepository {
                                 connection -> {
                                     final Statement statement = connection.createStatement(CLOSE_LOCK_SQL);
                                     statement.bind("$1", -1);
-                                    statement.bind("$2", m.getVersion() + 1);
-                                    statement.bind("$3", m.getUpdateDate());
                                     statement.bind("$4", id);
                                     statement.bind("$5", m.getVersion());
-                                    return Mono.from(statement.execute())
-                                            .flatMap(r -> Mono.from(r.getRowsUpdated()));
-                                },
-                                Connection::close
+                                    statement.bind("$2", (m.getVersion() + 1));
+                                    statement.bind("$3", m.getModificationDateTime());
+                                    return Mono.from(statement.execute()).flatMap(r -> Mono.from(r.getRowsUpdated()));
+                                }, Connection::close
                         ).switchIfEmpty(Mono.error(new DataBaseException(
                                 this.getClass(),
-                                "fun closeLock0(int id). -> Update data error",
-                                "Update data error"
+                                "fun closeLock0(int id). -> [ closeLock0(...) data base exception. ]",
+                                "closeLock0(...) data base exception."
                         )));
                     } else {
                         return Mono.just(0L);
@@ -410,13 +443,14 @@ public class UploadRepository {
                             model.setName(row.get("name", String.class));
                             model.setSize(row.get("size", Long.class));
                             model.setSource(row.get("source", String.class));
+                            model.setOwner(row.get("owner", String.class));
                             model.setStorageType(row.get("storage_type", String.class));
                             model.setStorageLocation(row.get("storage_location", String.class));
-                            model.setOwner(row.get("owner", String.class));
-                            model.setCreateDate(row.get("create_date", LocalDateTime.class));
-                            model.setUpdateDate(row.get("update_date", LocalDateTime.class));
-                            model.setOperator(row.get("operator", String.class));
                             model.setLock(row.get("lock", Integer.class));
+                            model.setCreator(row.get("creator", String.class));
+                            model.setModifier(row.get("modifier", String.class));
+                            model.setCreationDateTime(row.get("creation_date_time", LocalDateTime.class));
+                            model.setModificationDateTime(row.get("modification_date_time", LocalDateTime.class));
                             model.setVersion(row.get("version", Integer.class));
                             return model;
                         }))), Connection::close);
@@ -433,13 +467,13 @@ public class UploadRepository {
         return this.findById(model.getId())
                 .switchIfEmpty(Mono.error(new DataBaseException(
                         this.getClass(),
-                        "fun update(UploadModel model). -> Get data error",
-                        "Get data error"
+                        "fun update(UploadModel model). -> [ update(...) get data does not exist exception. ]",
+                        "update(...) get data does not exist exception."
                 )))
                 .flatMap(m -> {
-                    model.setVersion(m.getId());
+                    model.setId(m.getId());
                     model.setVersion(m.getVersion());
-                    model.setUpdateDate(LocalDateTime.now());
+                    model.setModificationDateTime(LocalDateTime.now());
                     return Mono.usingWhen(
                             this.factory.create(),
                             connection -> {
@@ -509,8 +543,8 @@ public class UploadRepository {
                             Connection::close
                     ).switchIfEmpty(Mono.error(new DataBaseException(
                             this.getClass(),
-                            "fun update(int id). -> Update data error",
-                            "Update data error"
+                            "fun update(int id). -> [ closeLock0(...) data base exception. ]",
+                            "closeLock0(...) data base exception."
                     )));
                 });
     }
@@ -521,7 +555,6 @@ public class UploadRepository {
      * @param id ID
      * @return Mono<Long> 受影响的数据条数
      */
-    @SuppressWarnings("ALL")
     public Mono<Long> deleteById(int id) {
         return Mono.usingWhen(
                 this.factory.create(),

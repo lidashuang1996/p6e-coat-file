@@ -14,6 +14,7 @@
     <description>p6e-coat-starter-file</description>
 
     <dependencies>
+
         <!--  R2DBC POOL [START]  -->
         <dependency>
             <groupId>io.r2dbc</groupId>
@@ -28,21 +29,19 @@
         </dependency>
         <!--  R2DBC PostGreSQL [END]  -->
 
+        <!--  Spring Boot Web Flux [START]  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <!--  Spring Boot Web Flux [END]  -->
+
         <!--  Spring Common [START]  -->
         <dependency>
             <groupId>club.p6e.coat</groupId>
             <artifactId>p6e-coat-starter-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-web</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-data-jpa</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!--  Spring Common [END]  -->
+
     </dependencies>
 </project>
