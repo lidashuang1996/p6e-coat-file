@@ -1,18 +1,20 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.common.error.ResourceException;
 import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.service.ResourceService;
 import club.p6e.coat.file.context.ResourceContext;
 import club.p6e.coat.common.error.ResourceNodeException;
 import club.p6e.coat.file.Properties;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,34 +57,44 @@ public class ResourceServiceImpl implements ResourceService {
         if (resource == null) {
             return Mono.error(new ResourceNodeException(
                     this.getClass(),
-                    "fun execute(ResourceContext context). " +
-                            "-> Unable to find corresponding resource context node.",
-                    "Unable to find corresponding resource context node")
+                    "fun execute(ResourceContext context). ==> " +
+                            "execute(...) unable to find corresponding resource context node.",
+                    "execute(...) unable to find corresponding resource context node.")
             );
         } else {
-            final String path = context.getPath();
-            final String suffix = FileUtil.getSuffix(path);
-            final Map<String, MediaType> suffixes = resource.getSuffixes();
-            if (suffixes.get(suffix) != null) {
-                final MediaType mediaType = suffixes.get(suffix);
-                final Map<String, Object> extend = new HashMap<>() {{
-                    putAll(resource.getExtend());
-                    putAll(context);
-                }};
-                return fileReadWriteService.read(
-                        resource.getType(),
-                        resource.getPath(),
-                        path,
-                        mediaType,
-                        extend
+            final List<String> nodes = context.get("$node") == null
+                    ? List.of() : List.of(context.get("$node").toString().split(","));
+            if (nodes.contains(context.getNode())) {
+                return Mono.error(new ResourceException(
+                        this.getClass(),
+                        "fun execute(ResourceContext context). ==> " +
+                                "execute(...) exception without permission for this node.",
+                        "execute(...) exception without permission for this node.")
                 );
             } else {
-                return Mono.error(new ResourceNodeException(
-                        this.getClass(),
-                        "fun execute(ResourceContext context). " +
-                                "-> The media resource corresponding to the resource node does not exist.",
-                        "The media resource corresponding to the resource node does not exist")
-                );
+                final String path = context.getPath();
+                final String suffix = FileUtil.getSuffix(path);
+                final Map<String, MediaType> suffixes = resource.getSuffixes();
+                if (suffixes.get(suffix) != null) {
+                    final MediaType mediaType = suffixes.get(suffix);
+                    return fileReadWriteService.read(
+                            resource.getType(),
+                            resource.getPath(),
+                            path,
+                            mediaType,
+                            new HashMap<>() {{
+                                putAll(context);
+                                putAll(resource.getExtend());
+                            }}
+                    );
+                } else {
+                    return Mono.error(new ResourceException(
+                            this.getClass(),
+                            "fun execute(ResourceContext context). ==> " +
+                                    "execute(...) the media resource corresponding to the resource node does not exist.",
+                            "execute(...) the media resource corresponding to the resource node does not exist")
+                    );
+                }
             }
         }
     }

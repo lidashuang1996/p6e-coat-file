@@ -41,9 +41,10 @@ public class UploadModel implements Serializable {
         map.put("storageType", storageType);
         map.put("storageLocation", storageLocation);
         map.put("owner", owner);
-        map.put("createDate", createDate);
-        map.put("updateDate", updateDate);
-        map.put("operator", operator);
+        map.put("creator", creator);
+        map.put("modifier", modifier);
+        map.put("creationDateTime", creationDateTime);
+        map.put("modificationDateTime", modificationDateTime);
         map.put("lock", lock);
         map.put("version", version);
         return map;

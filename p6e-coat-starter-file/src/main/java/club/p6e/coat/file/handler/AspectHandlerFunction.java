@@ -164,8 +164,9 @@ public class AspectHandlerFunction {
                         } else {
                             return Mono.error(new AspectContactException(
                                     this.getClass(),
-                                    "fun before() -> Action before intercept return false/error",
-                                    "Aspect handler before intercept return false/error"
+                                    "fun before(List<? extends Aspect> aspects, Map<String, Object> data, int index). " +
+                                            "==> before(...) action before intercept return false exception.",
+                                    "before(...) action before intercept return false exception."
                             ));
                         }
                     });
@@ -213,8 +214,9 @@ public class AspectHandlerFunction {
                         } else {
                             return Mono.error(new AspectContactException(
                                     this.getClass(),
-                                    "fun after() -> Action after intercept return false/error",
-                                    "Aspect handler after intercept return false/error"
+                                    "fun after(List<? extends Aspect> aspects, Map<String, Object> data, Map<String, Object> result, int index). " +
+                                            "==> after(...) action after intercept return false exception.",
+                                    "after(...) action after intercept return false exception."
                             ));
                         }
                     });

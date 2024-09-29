@@ -1,7 +1,7 @@
 package club.p6e.coat.file;
 
 import club.p6e.coat.common.error.FileException;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.io.File;
 import java.security.MessageDigest;
 
 /**
- * 文件签名服务的默认实现
+ * 文件签名服务
  *
  * @author lidashuang
  * @version 1.0
@@ -34,9 +34,10 @@ public class FileSignatureServiceImpl implements FileSignatureService {
         final FileSignatureService.DigestAlgorithm digestAlgorithm = new DefaultDigestAlgorithm();
         return Mono.just(file)
                 .flatMap(f -> FileUtil.checkFileExist(f) ? Mono.just(f) : Mono.error(new FileException(
-                        FileUtil.class,
-                        "fun execute(File file). -> The content read by the signature is not a file.",
-                        "The content read by the signature is not a file"
+                        FileSignatureServiceImpl.class,
+                        "fun execute(File file). ==> " +
+                                "execute(...) resource data is not a file exception.",
+                        "execute(...) resource data is not a file exception."
                 )))
                 .flatMap(f -> FileUtil
                         .readFile(file)

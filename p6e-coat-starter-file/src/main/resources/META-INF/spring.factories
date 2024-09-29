@@ -22,7 +22,6 @@ club.p6e.coat.file.mapper.SliceUploadContextRequestParameterMapper,\
 club.p6e.coat.file.repository.UploadChunkRepository,\
 club.p6e.coat.file.repository.UploadRepository,\
 club.p6e.coat.file.router.CloseUploadRouterFunction,\
-club.p6e.coat.file.router.CloseUploadRouterFunction,\
 club.p6e.coat.file.router.DownloadRouterFunction,\
 club.p6e.coat.file.router.OpenUploadRouterFunction,\
 club.p6e.coat.file.router.ResourceRouterFunction,\

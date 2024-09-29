@@ -5,7 +5,7 @@ import club.p6e.coat.file.service.OpenUploadService;
 import club.p6e.coat.file.context.OpenUploadContext;
 import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadRepository;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -48,18 +48,19 @@ public class OpenUploadServiceImpl implements OpenUploadService {
     @Override
     public Mono<Map<String, Object>> execute(OpenUploadContext context) {
         final UploadModel model = new UploadModel();
-        final Object operator = context.get("operator");
+        final Object operator = context.get("$operator");
         if (operator instanceof final String content) {
             model.setOwner(content);
-            model.setOperator(content);
+            model.setCreator(content);
+            model.setModifier(content);
         }
         final String name = FileUtil.name(context.getName());
         if (name == null) {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(OpenUploadContext context)." +
-                            "-> <name> Request parameter format error.",
-                    "<name> Request parameter format error")
+                    "fun execute(OpenUploadContext context). ==> " +
+                            "execute(...) request parameter <name> exception.",
+                    "execute(...) request parameter <name> exception.")
             );
         }
         model.setName(name);

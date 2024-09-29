@@ -3,7 +3,8 @@ package club.p6e.coat.file.task;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.model.UploadChunkModel;
 import club.p6e.coat.file.repository.UploadChunkRepository;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.repository.UploadRepository;
+import club.p6e.coat.file.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -39,6 +40,11 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
     /**
      * 分片上传的配置信息存储库
      */
+    private final UploadRepository uploadRepository;
+
+    /**
+     * 分片上传的配置信息存储库
+     */
     private final UploadChunkRepository uploadChunkRepository;
 
     /**
@@ -48,9 +54,11 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
      */
     public FileSliceCleanTaskStrategyServiceImpl(
             Properties properties,
+            UploadRepository uploadRepository,
             UploadChunkRepository uploadChunkRepository
     ) {
         this.properties = properties;
+        this.uploadRepository = uploadRepository;
         this.uploadChunkRepository = uploadChunkRepository;
     }
 
@@ -59,7 +67,7 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
         final int s = ThreadLocalRandom.current().nextInt(2, 6);
         final int f = ThreadLocalRandom.current().nextInt(0, 60);
         final int m = ThreadLocalRandom.current().nextInt(0, 60);
-        return m + " " + f + " " + s + " * * ?";
+        return m + " " + f + " " + s + " * * *";
     }
 
     @Override
@@ -73,20 +81,18 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
             final Properties.SliceUpload sliceUpload = properties.getSliceUpload();
             while (true) {
                 final UploadChunkModel model = uploadChunkRepository
-                        .select(index.get(), LocalDateTime.now().minusDays(30)).block();
+                        .selectExpireData(index.get(), LocalDateTime.now().minusDays(30)).block();
                 if (model == null || model.getId() == null || model.getFid() == null) {
                     break;
                 } else {
                     index.set(model.getId());
-                    final String folder = FileUtil.composePath(sliceUpload.getPath(), String.valueOf(model.getFid()));
-                    if (FileUtil.checkFolderExist(folder)) {
-                        FileUtil.deleteFolder(folder);
-                    }
+                    FileUtil.deleteFolder(FileUtil.composePath(sliceUpload.getPath(), String.valueOf(model.getFid())));
+                    uploadRepository.delete(model.getFid()).block();
                     uploadChunkRepository.deleteByFid(model.getFid()).block();
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("[P6E FILE TASK ERROR]", e);
+            LOGGER.error("[ FILE TASK ERROR ] >>> ", e);
         }
     }
 

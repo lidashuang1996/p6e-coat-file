@@ -22,8 +22,11 @@ public class UploadChunkModel implements Serializable {
     private Integer fid;
     private String name;
     private Long size;
-    private LocalDateTime date;
-    private String operator;
+    private String creator;
+    private String modifier;
+    private LocalDateTime creationDateTime;
+    private LocalDateTime modificationDateTime;
+    private Integer version;
 
     public Map<String, Object> toMap() {
         final Map<String, Object> map = new HashMap<>(6);
@@ -31,8 +34,11 @@ public class UploadChunkModel implements Serializable {
         map.put("fid", fid);
         map.put("name", name);
         map.put("size", size);
-        map.put("date", date);
-        map.put("operator", operator);
+        map.put("creator", creator);
+        map.put("modifier", modifier);
+        map.put("creationDateTime", creationDateTime);
+        map.put("modificationDateTime", modificationDateTime);
+        map.put("version", version);
         return map;
     }
 

@@ -7,6 +7,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
 /**
+ * 任务调度配置
+ *
  * @author lidashuang
  * @version 1.0
  */

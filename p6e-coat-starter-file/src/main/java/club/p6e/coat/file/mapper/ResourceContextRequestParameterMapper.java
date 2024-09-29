@@ -2,7 +2,7 @@ package club.p6e.coat.file.mapper;
 
 import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.file.context.ResourceContext;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -53,9 +53,9 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). -> URL PARAM " +
-                            "<" + NODE_PARAMETER_NAME + "> Request parameter is null",
-                    "URL PARAM <" + NODE_PARAMETER_NAME + "> Request parameter is null"
+                    "fun execute(ServerRequest request). ==> " +
+                            "URL PARAM <" + NODE_PARAMETER_NAME + "> request parameter is null.",
+                    "URL PARAM <" + NODE_PARAMETER_NAME + "> request parameter is null."
             ));
         }
         if (paths != null && !paths.isEmpty() && paths.get(0) != null) {
@@ -65,9 +65,9 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
             if (name == null) {
                 return Mono.error(new ParameterException(
                         this.getClass(),
-                        "fun execute(ServerRequest request). " +
-                                "URL PARAM <" + PATH_PARAMETER_NAME + "> Request parameter format error",
-                        "URL PARAM <" + PATH_PARAMETER_NAME + "> Request parameter format error"
+                        "fun execute(ServerRequest request). ==> " +
+                                "URL PARAM <" + PATH_PARAMETER_NAME + "> request parameter format error.",
+                        "URL PARAM <" + PATH_PARAMETER_NAME + "> request parameter format error."
                 ));
             } else {
                 context.setPath(FileUtil.composePath(path, name));
@@ -75,8 +75,8 @@ public class ResourceContextRequestParameterMapper extends RequestParameterMappe
         } else {
             return Mono.error(new ParameterException(
                     this.getClass(),
-                    "fun execute(ServerRequest request). -> Request parameter is null",
-                    "Request parameter is null"
+                    "fun execute(ServerRequest request). ==> execute(...) request parameter is null.",
+                    "execute(...) request parameter is null."
             ));
         }
         return Mono.just(context);

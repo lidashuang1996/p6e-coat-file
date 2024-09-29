@@ -63,23 +63,20 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                 RequestParameterMapper.execute(request, DownloadContext.class)
                         // 执行下载文件之前的切点
                         .flatMap(c -> before(aspects, c))
-                        .flatMap(m -> service
-                                // 执行下载文件
-                                .execute(new DownloadContext(m))
-                                // 执行下载文件之后的切点
-                                .flatMap(fra -> after(aspects, m, null).map(r -> fra)))
+                        // 执行下载文件
+                        .flatMap(m -> service.execute(new DownloadContext(m)).flatMap(fra -> after(aspects, m, null).map(r -> fra)))
+                        // 结果返回
                         .flatMap(fra -> {
                             final String fc;
                             final List<HttpRange> ranges = request.headers().range();
                             try {
                                 fc = URLEncoder.encode(fra.model().getName(), StandardCharsets.UTF_8);
                             } catch (Exception e) {
-                                // 忽略异常
                                 return Mono.error(new FileException(
                                         this.getClass(),
-                                        "fun handle(ServerRequest request). -> " +
-                                                "Download file name parsing exception.",
-                                        "Download file name parsing exception"
+                                        "fun handle(ServerRequest request). ==> " +
+                                                "handle(...) download file name parsing exception.",
+                                        "handle(...) download file name parsing exception."
                                 ));
                             }
                             if (!ranges.isEmpty()) {
@@ -97,7 +94,8 @@ public class DownloadHandlerFunction extends AspectHandlerFunction implements Ha
                                         .header("Content-Disposition", "attachment; filename=" + fc)
                                         .body((response, context) -> response.writeWith(fra.execute(sl, cl)));
                             } else {
-                                return ServerResponse.ok()
+                                return ServerResponse
+                                        .ok()
                                         .header(HttpHeaders.ACCEPT_RANGES, "bytes")
                                         .header("Content-Disposition", "attachment; filename=" + fc)
                                         .contentType(MediaType.APPLICATION_OCTET_STREAM)

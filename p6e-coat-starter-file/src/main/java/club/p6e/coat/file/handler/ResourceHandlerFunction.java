@@ -60,11 +60,8 @@ public class ResourceHandlerFunction extends AspectHandlerFunction implements Ha
                 RequestParameterMapper.execute(request, ResourceContext.class)
                         // 执行资源查看之前的切点
                         .flatMap(c -> before(aspects, c))
-                        .flatMap(m -> service
-                                // 执行资源查看
-                                .execute(new ResourceContext(m))
-                                // 执行资源查看之后的切点
-                                .flatMap(fra -> after(aspects, m, null).map(r -> fra)))
+                        // 执行资源查看
+                        .flatMap(m -> service.execute(new ResourceContext(m)).flatMap(fra -> after(aspects, m, null).map(r -> fra)))
                         // 结果返回
                         .flatMap(fra -> {
                             final MediaType mediaType = fra.mediaType();

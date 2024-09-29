@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
  * @author lidashuang
  * @version 1.0
  */
-@SuppressWarnings("ALL")
 public class BaseRouterFunction implements RouterFunction<ServerResponse> {
 
     /**
@@ -38,6 +37,7 @@ public class BaseRouterFunction implements RouterFunction<ServerResponse> {
      *
      * @param predicate 请求谓词对象
      */
+    @SuppressWarnings("ALL")
     public BaseRouterFunction(RequestPredicate predicate) {
         this.predicate = predicate;
         this.handlerFunction = request -> ServerResponse.ok().bodyValue(AspectHandlerFunction.ResultContext.build());
@@ -49,6 +49,7 @@ public class BaseRouterFunction implements RouterFunction<ServerResponse> {
      * @param predicate       请求谓词对象
      * @param handlerFunction 处理函数对象
      */
+    @SuppressWarnings("ALL")
     public BaseRouterFunction(RequestPredicate predicate, HandlerFunction<ServerResponse> handlerFunction) {
         this.predicate = predicate;
         this.setHandlerFunction(handlerFunction);
@@ -79,6 +80,7 @@ public class BaseRouterFunction implements RouterFunction<ServerResponse> {
      *
      * @param predicate 请求谓词对象
      */
+    @SuppressWarnings("ALL")
     public void setPredicate(RequestPredicate predicate) {
         this.predicate = predicate;
     }
@@ -101,6 +103,7 @@ public class BaseRouterFunction implements RouterFunction<ServerResponse> {
      * @param throwable 异常对象
      * @return Mono<ServerResponse> ServerResponse 对象
      */
+    @SuppressWarnings("ALL")
     private Mono<ServerResponse> throwableHandler(Throwable throwable) {
         LOGGER.error(throwable.getMessage());
         throwable = CustomException.transformation(throwable);

@@ -1,9 +1,6 @@
 package club.p6e.coat.file.utils;
 
 import club.p6e.coat.common.utils.GeneratorUtil;
-import club.p6e.coat.common.error.FileException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileUrlResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -44,11 +41,6 @@ public final class FileUtil {
     private static final DefaultDataBufferFactory DEFAULT_DATA_BUFFER_FACTORY = new DefaultDataBufferFactory();
 
     /**
-     * 日志对象
-     */
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUtil.class);
-
-    /**
      * 验证文件夹是否存在
      *
      * @param folder 文件夹对象
@@ -81,33 +73,25 @@ public final class FileUtil {
     /**
      * 创建文件夹
      *
-     * @param folder      文件夹对象
-     * @param deleteExist 是否删除存在的文件夹
+     * @param folder        文件夹对象
+     * @param isDeleteExist 是否删除存在的文件夹
      */
     @SuppressWarnings("ALL")
-    public static boolean createFolder(File folder, boolean deleteExist) {
+    public static boolean createFolder(File folder, boolean isDeleteExist) {
         if (folder == null) {
             return false;
-        }
-        final String absolutePath = folder.getAbsolutePath();
-        if (folder.exists()) {
-            LOGGER.debug("[ CreateFolder ] => " + absolutePath + " exists !");
-            if (deleteExist) {
-                LOGGER.debug("[ CreateFolder ] => " + absolutePath + " exists >>> need delete !");
-                if (deleteFolder(folder)) {
-                    LOGGER.debug("[ CreateFolder ] => " + absolutePath + " delete >>> success !");
-                } else {
-                    return false;
-                }
-            } else {
-                return true;
-            }
-        }
-        if (folder.mkdirs()) {
-            LOGGER.debug("[ CreateFolder ] => " + absolutePath + " mkdirs >>> success !");
-            return true;
         } else {
-            return false;
+            final String absolutePath = folder.getAbsolutePath();
+            if (folder.exists()) {
+                if (isDeleteExist) {
+                    if (!deleteFolder(folder)) {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            return folder.mkdirs();
         }
     }
 
@@ -124,15 +108,15 @@ public final class FileUtil {
     /**
      * 创建文件夹
      *
-     * @param folderPath  文件夹路径
-     * @param deleteExist 是否删除存在的文件夹
+     * @param folderPath    文件夹路径
+     * @param isDeleteExist 是否删除存在的文件夹
      */
     @SuppressWarnings("ALL")
-    public static boolean createFolder(String folderPath, boolean deleteExist) {
-        if (folderPath == null) {
+    public static boolean createFolder(String folderPath, boolean isDeleteExist) {
+        if (folderPath == null || folderPath.isEmpty()) {
             return false;
         } else {
-            return createFolder(new File(folderPath), deleteExist);
+            return createFolder(new File(folderPath), isDeleteExist);
         }
     }
 
@@ -145,31 +129,27 @@ public final class FileUtil {
     public static boolean deleteFolder(File folder) {
         if (folder == null) {
             return false;
-        }
-        if (folder.isDirectory()) {
-            boolean result = true;
-            LOGGER.debug("[ DeleteFolder ] => " + folder.getAbsolutePath() + " >>> [START]");
-            final File[] files = folder.listFiles();
-            if (files != null) {
-                LOGGER.debug("[ DeleteFolder ] => " + folder.getAbsolutePath() + " catalogue (" + files.length + ")");
-                for (final File f : files) {
-                    if (f.isFile()) {
-                        if (!deleteFile(f)) {
-                            result = false;
-                        }
-                    } else if (f.isDirectory()) {
-                        if (!deleteFolder(f)) {
-                            result = false;
+        } else {
+            if (folder.exists() && folder.isDirectory()) {
+                boolean result = true;
+                final File[] files = folder.listFiles();
+                if (files != null) {
+                    for (final File file : files) {
+                        if (file.isFile()) {
+                            if (!deleteFile(file)) {
+                                result = false;
+                            }
+                        } else if (file.isDirectory()) {
+                            if (!deleteFolder(file)) {
+                                result = false;
+                            }
                         }
                     }
                 }
-                LOGGER.debug("[ DeleteFolder ] => " + folder.getAbsolutePath() + " delete >>> " + folder.delete());
+                return result;
+            } else {
+                return false;
             }
-            LOGGER.debug("[ DeleteFolder ] => " + folder.getAbsolutePath() + " >>> [END]");
-            return result;
-        } else {
-            LOGGER.debug("[ DeleteFolder ] ERROR => " + folder.getAbsolutePath() + " is not folder.");
-            return false;
         }
     }
 
@@ -180,7 +160,7 @@ public final class FileUtil {
      */
     @SuppressWarnings("ALL")
     public static boolean deleteFolder(String folderPath) {
-        if (folderPath == null) {
+        if (folderPath == null || folderPath.isEmpty()) {
             return false;
         } else {
             return deleteFolder(new File(folderPath));
@@ -234,7 +214,7 @@ public final class FileUtil {
      */
     @SuppressWarnings("ALL")
     public static File[] readFolder(File folder, Predicate<? super File> predicate) {
-        if (folder != null && folder.isDirectory()) {
+        if (checkFolderExist(folder)) {
             final File[] files = folder.listFiles();
             if (files != null && files.length > 0) {
                 if (predicate == null) {
@@ -276,17 +256,10 @@ public final class FileUtil {
      */
     @SuppressWarnings("ALL")
     public static boolean deleteFile(File file) {
-        if (file == null) {
-            return false;
+        if (file != null && file.exists() && file.isFile()) {
+            return file.delete();
         } else {
-            if (file.isFile()) {
-                final boolean result = file.delete();
-                LOGGER.debug("[ DeleteFile ] => " + file.getAbsolutePath() + " delete >>> " + result);
-                return result;
-            } else {
-                LOGGER.debug("[ DeleteFile ] ERROR => " + file.getAbsolutePath() + " is not file.");
-                return false;
-            }
+            return false;
         }
     }
 
@@ -324,18 +297,18 @@ public final class FileUtil {
     public static Flux<DataBuffer> readFile(File file, long position, long size) {
         if (file != null && checkFileExist(file)) {
             try {
-                final long fSize = size >= 0 ? size : 1 + size + file.length();
-                final AtomicLong at = new AtomicLong(0);
+                final long fs = size >= 0 ? size : 1 + size + file.length();
+                final AtomicLong aLong = new AtomicLong(0);
                 return DataBufferUtils
                         .read(new FileUrlResource(file.getAbsolutePath()), position, DEFAULT_DATA_BUFFER_FACTORY, FILE_BUFFER_SIZE)
                         .map(b -> {
-                            if (at.get() >= fSize) {
+                            if (aLong.get() >= fs) {
                                 DataBufferUtils.release(b);
                                 return DEFAULT_DATA_BUFFER_FACTORY.allocateBuffer(0);
                             } else {
-                                final int rp = b.readableByteCount();
-                                if (at.addAndGet(rp) >= fSize) {
-                                    final byte[] bytes = new byte[(int) (fSize - at.get() + rp)];
+                                final int rbc = b.readableByteCount();
+                                if (aLong.addAndGet(rbc) >= fs) {
+                                    final byte[] bytes = new byte[(int) (fs - aLong.get() + rbc)];
                                     b.read(bytes);
                                     DataBufferUtils.release(b);
                                     return DEFAULT_DATA_BUFFER_FACTORY.wrap(bytes);
@@ -348,11 +321,7 @@ public final class FileUtil {
                 return Flux.error(e);
             }
         } else {
-            return Flux.error(new FileException(
-                    FileUtil.class,
-                    "fun readFile(File file). -> The read content is not a file.",
-                    "The read content is not a file"
-            ));
+            return Flux.empty();
         }
     }
 
@@ -365,8 +334,7 @@ public final class FileUtil {
      */
     @SuppressWarnings("ALL")
     public static Mono<Void> writeFile(Flux<DataBuffer> dataBufferFlux, File file) {
-        return DataBufferUtils.write(dataBufferFlux, file.toPath(),
-                StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        return DataBufferUtils.write(dataBufferFlux, file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
     }
 
     /**
@@ -378,10 +346,7 @@ public final class FileUtil {
      */
     @SuppressWarnings("ALL")
     public static String composeFile(String name, String suffix) {
-        if (name == null
-                || suffix == null
-                || name.isEmpty()
-                || suffix.isEmpty()) {
+        if (name == null || suffix == null || name.isEmpty() || suffix.isEmpty()) {
             return null;
         } else {
             return name + FILE_CONNECT_CHAR + suffix;
@@ -474,7 +439,7 @@ public final class FileUtil {
      * @return 文件的长度
      */
     @SuppressWarnings("ALL")
-    public static long obtainFileLength(File... files) {
+    public static long getFileLength(File... files) {
         long length = 0;
         if (files == null || files.length == 0) {
             return 0L;
@@ -499,16 +464,11 @@ public final class FileUtil {
     public static Mono<File> mergeFileSlice(File[] files, String filePath) {
         if (files == null
                 || filePath == null
+                || filePath.isEmpty()
                 || files.length == 0) {
             return Mono.empty();
         } else {
-            final File file = new File(filePath);
-            if (checkFileExist(file)) {
-                deleteFile(file);
-            }
-            return writeFile(Flux.concat(
-                    Arrays.stream(files).map(FileUtil::readFile).toList()
-            ), file).then(Mono.just(file));
+            return mergeFileSlice(files, new File(filePath));
         }
     }
 
@@ -525,9 +485,7 @@ public final class FileUtil {
                 || files.length == 0) {
             return Mono.empty();
         } else {
-            if (checkFileExist(file)) {
-                deleteFile(file);
-            }
+            deleteFile(file);
             return writeFile(Flux.concat(
                     Arrays.stream(files).map(FileUtil::readFile).toList()
             ), file).then(Mono.just(file));

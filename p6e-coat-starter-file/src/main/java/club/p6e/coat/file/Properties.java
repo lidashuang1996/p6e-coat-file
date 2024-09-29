@@ -28,27 +28,36 @@ import java.util.Map;
 public class Properties implements Serializable {
 
     /**
-     * 分片上传配置
+     * 分片上传
      */
     private SliceUpload sliceUpload = new SliceUpload();
 
     /**
-     * 上传配置
+     * 分片上传类
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class SliceUpload implements Serializable {
+
+        /**
+         * 基础的文件路径
+         */
+        private String path = "/opt/data/p6e/file/slice";
+
+        /**
+         * 允许上传的文件大小的最大值
+         */
+        private long maxSize = 1024 * 1024 * 30;
+
+    }
+
+    /**
+     * 上传
      */
     private Map<String, Upload> uploads = new HashMap<>();
 
     /**
-     * 资源配置
-     */
-    private Map<String, Resource> resources = new HashMap<>();
-
-    /**
-     * 下载配置
-     */
-    private Map<String, Download> downloads = new HashMap<>();
-
-    /**
-     * 下载
+     * 上传
      */
     @Data
     @Accessors(chain = true)
@@ -70,6 +79,40 @@ public class Properties implements Serializable {
         private Map<String, String> extend = new HashMap<>();
 
     }
+
+    /**
+     * 下载
+     */
+    private Map<String, Download> downloads = new HashMap<>();
+
+    /**
+     * 下载
+     */
+    @Data
+    @Accessors(chain = true)
+    public static class Download implements Serializable {
+
+        /**
+         * 资源类型
+         */
+        private String type = "DISK";
+
+        /**
+         * 基础的文件路径
+         */
+        private String path;
+
+        /**
+         * 扩展参数
+         */
+        private Map<String, String> extend = new HashMap<>();
+
+    }
+
+    /**
+     * 资源配置
+     */
+    private Map<String, Resource> resources = new HashMap<>();
 
     /**
      * 资源
@@ -97,46 +140,6 @@ public class Properties implements Serializable {
          * 允许的文件后缀以及对应的媒体类型
          */
         private Map<String, MediaType> suffixes = new HashMap<>();
-
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static class Download implements Serializable {
-
-        /**
-         * 资源类型
-         */
-        private String type = "DISK";
-
-        /**
-         * 基础的文件路径
-         */
-        private String path;
-
-        /**
-         * 扩展参数
-         */
-        private Map<String, String> extend = new HashMap<>();
-
-    }
-
-    /**
-     * 分片上传
-     */
-    @Data
-    @Accessors(chain = true)
-    public static class SliceUpload implements Serializable {
-
-        /**
-         * 基础的文件路径
-         */
-        private String path = "/opt/data/p6e/file/slice";
-
-        /**
-         * 允许上传的文件大小的最大值
-         */
-        private long maxSize = 1024 * 1024 * 20;
 
     }
 

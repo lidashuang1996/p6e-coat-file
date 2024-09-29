@@ -23,7 +23,10 @@ public interface FileReadWriteService {
      * @return 文件模型对象
      */
     public Mono<FileActuatorModel> write(
-            String name, Map<String, Object> extend, FileWriteActuator fileWriteActuator);
+            String name,
+            Map<String, Object> extend,
+            FileWriteActuator fileWriteActuator
+    );
 
     /**
      * 读取文件
@@ -36,6 +39,11 @@ public interface FileReadWriteService {
      * @return 文件读取执行器对象
      */
     public Mono<FileReadActuator> read(
-            String type, String base, String path, MediaType mediaType, Map<String, Object> extend);
+            String type,
+            String base,
+            String path,
+            MediaType mediaType,
+            Map<String, Object> extend
+    );
 
 }

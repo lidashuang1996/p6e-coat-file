@@ -1,5 +1,6 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.common.error.ResourceException;
 import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.service.DownloadService;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * 下载文件服务
@@ -57,22 +58,32 @@ public class DownloadServiceImpl implements DownloadService {
         if (download == null) {
             return Mono.error(new DownloadNodeException(
                     this.getClass(),
-                    "fun execute(DownloadContext context). " +
-                            "-> Unable to find corresponding download node.",
-                    "Unable to find corresponding download node")
+                    "fun execute(DownloadContext context). ==> " +
+                            "execute(...) unable to find corresponding resource context node.",
+                    "execute(...) unable to find corresponding resource context node.")
             );
         } else {
-            final Map<String, Object> extend = new HashMap<>() {{
-                putAll(download.getExtend());
-                putAll(context);
-            }};
-            return fileReadWriteService.read(
-                    download.getType(),
-                    download.getPath(),
-                    context.getPath(),
-                    MediaType.APPLICATION_OCTET_STREAM,
-                    extend
-            );
+            final List<String> nodes = context.get("$node") == null
+                    ? List.of() : List.of(context.get("$node").toString().split(","));
+            if (nodes.contains(context.getNode())) {
+                return Mono.error(new ResourceException(
+                        this.getClass(),
+                        "fun execute(DownloadContext context). ==> " +
+                                "execute(...) exception without permission for this node.",
+                        "execute(...) exception without permission for this node.")
+                );
+            } else {
+                return fileReadWriteService.read(
+                        download.getType(),
+                        download.getPath(),
+                        context.getPath(),
+                        MediaType.APPLICATION_OCTET_STREAM,
+                        new HashMap<>() {{
+                            putAll(context);
+                            putAll(download.getExtend());
+                        }}
+                );
+            }
         }
     }
 }

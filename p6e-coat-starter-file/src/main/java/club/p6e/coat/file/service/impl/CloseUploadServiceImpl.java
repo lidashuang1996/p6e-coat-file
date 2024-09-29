@@ -1,5 +1,6 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.common.error.ResourceException;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.actuator.FileWriteActuator;
 import club.p6e.coat.common.error.ResourceNodeException;
@@ -8,13 +9,14 @@ import club.p6e.coat.file.service.CloseUploadService;
 import club.p6e.coat.file.context.CloseUploadContext;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.repository.UploadRepository;
-import club.p6e.coat.common.utils.FileUtil;
+import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -69,21 +71,33 @@ public class CloseUploadServiceImpl implements CloseUploadService {
         if (upload == null) {
             return Mono.error(new ResourceNodeException(
                     this.getClass(),
-                    "fun execute(CloseUploadContext context). " +
-                            "-> Unable to find corresponding resource context node.",
-                    "Unable to find corresponding resource context node")
+                    "fun execute(CloseUploadContext context). ==> " +
+                            "execute(...) unable to find corresponding resource context node.",
+                    "execute(...) unable to find corresponding resource context node.")
+            );
+        }
+        final List<String> nodes = context.get("$node") == null
+                ? List.of() : List.of(context.get("$node").toString().split(","));
+        if (nodes.contains(context.getNode())) {
+            return Mono.error(new ResourceException(
+                    this.getClass(),
+                    "fun execute(CloseUploadContext context). ==> " +
+                            "execute(...) exception without permission for this node.",
+                    "execute(...) exception without permission for this node.")
             );
         }
         return repository
                 .closeLock(context.getId())
                 .flatMap(l -> repository.findById(context.getId()))
                 .flatMap(m -> {
-                    final Object operator = context.get("operator");
+                    final Object operator = context.get("$operator");
                     if (operator instanceof final String content) {
-                        m.setOperator(content);
+                        m.setModifier(content);
                     }
+                    // 文件夹绝对路径
                     final String absolutePath = FileUtil.convertAbsolutePath(
-                            FileUtil.composePath(properties.getSliceUpload().getPath(), String.valueOf(m.getId())));
+                            FileUtil.composePath(properties.getSliceUpload().getPath(), String.valueOf(m.getId()))
+                    );
                     final File[] files = FileUtil.readFolder(absolutePath);
                     for (int i = 0; i < files.length; i++) {
                         for (int j = i; j < files.length; j++) {
@@ -98,37 +112,43 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                             }
                         }
                     }
-                    final Map<String, Object> extend = new HashMap<>() {{
-                        putAll(upload.getExtend());
-                        putAll(context);
-                    }};
                     return fileReadWriteService
-                            .write(m.getName(), extend, new FileWriteActuator() {
-                                @Override
-                                public String type() {
-                                    return upload.getType();
-                                }
-
-                                @Override
-                                public String path() {
-                                    return upload.getPath();
-                                }
-
-                                @Override
-                                public Mono<File> execute(File file) {
-                                    return FileUtil.mergeFileSlice(files, file);
-                                }
-                            })
-                            .flatMap(fm -> repository
-                                    .update(new UploadModel()
-                                            .setId(m.getId())
-                                            .setSize(fm.getLength())
-                                            .setStorageType(fm.getType())
-                                            .setStorageLocation(fm.getPath())
-                                    ))
-                            .flatMap(l -> repository.findById(m.getId()))
+                            .write(m.getName(), new HashMap<>() {{
+                                putAll(context);
+                                putAll(upload.getExtend());
+                            }}, new CustomFileWriteActuator(files, upload))
+                            .flatMap(fm -> repository.update(new UploadModel().setId(m.getId()).setSize(fm.getLength()).setStorageType(fm.getType()).setStorageLocation(fm.getPath())))
+                            .flatMap(rl -> repository.findById(m.getId()))
                             .map(UploadModel::toMap);
                 });
+    }
+
+    /**
+     * 自定义的文件写入执行器
+     *
+     * @param files      文件列表
+     * @param properties 上传配置对象
+     */
+    private record CustomFileWriteActuator(
+            File[] files,
+            Properties.Upload properties
+    ) implements FileWriteActuator {
+
+        @Override
+        public String type() {
+            return properties.getType();
+        }
+
+        @Override
+        public String path() {
+            return properties.getPath();
+        }
+
+        @Override
+        public Mono<File> execute(File file) {
+            return FileUtil.mergeFileSlice(files, file);
+        }
+
     }
 
 }
