@@ -33,6 +33,7 @@ club.p6e.coat.file.service.impl.SimpleUploadServiceImpl
 club.p6e.coat.file.service.impl.SliceUploadServiceImpl
 club.p6e.coat.file.task.FileSliceCleanTask
 club.p6e.coat.file.task.FileSliceCleanTaskStrategyServiceImpl
+club.p6e.coat.file.FilePermissionServiceImpl
 club.p6e.coat.file.FileReadWriteServiceImpl
 club.p6e.coat.file.FileSignatureServiceImpl
 club.p6e.coat.file.FolderStorageLocationPathServiceImpl

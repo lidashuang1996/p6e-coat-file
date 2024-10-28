@@ -104,7 +104,7 @@ public class AspectHandlerFunction {
      * 需要清除的请求参数名称
      */
     private static final List<String> CLEAN_REQUEST_PARAM_NAME = new CopyOnWriteArrayList<>(
-            List.of("operator")
+            List.of("$id", "$node", "$operator")
     );
 
     /**

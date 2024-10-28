@@ -59,7 +59,7 @@ public class UploadRepository {
             "       \"modification_date_time\",    " +
             "       \"version\"    " +
             "  FROM    " +
-            "       \"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "       \"" + DatabaseConfig.TABLE_PREFIX + "file_upload\"    " +
             "  WHERE    " +
             "       \"id\" = $1    " +
             "    ;    ";
@@ -67,7 +67,7 @@ public class UploadRepository {
     @SuppressWarnings("ALL")
     private static final String CREATE_SQL = "" +
             "    INSERT INTO    " +
-            "        \"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "        \"" + DatabaseConfig.TABLE_PREFIX + "file_upload\"    " +
             "    (    " +
             "       \"name\",    " +
             "       \"size\",    " +
@@ -102,7 +102,7 @@ public class UploadRepository {
             "    SET " +
             "        \"lock\" = $1,    " +
             "        \"version\" = $2,    " +
-            "        \"update_date\" = $3    " +
+            "        \"modification_date_time\" = $3    " +
             "    WHERE    " +
             "        \"id\" = $4    " +
             "        AND \"version\" = $5    " +
@@ -115,7 +115,7 @@ public class UploadRepository {
             "    SET " +
             "        \"lock\" = $1,    " +
             "        \"version\" = $2,    " +
-            "        \"update_date\" = $3    " +
+            "        \"modification_date_time\" = $3    " +
             "    WHERE    " +
             "        \"id\" = $4    " +
             "        AND \"version\" = $5    " +
@@ -124,7 +124,7 @@ public class UploadRepository {
     @SuppressWarnings("ALL")
     private static final String CLOSE_LOCK_SQL = "" +
             "    UPDATE    " +
-            "        \"" + DatabaseConfig.TABLE_PREFIX + "_file_upload\"    " +
+            "        \"" + DatabaseConfig.TABLE_PREFIX + "file_upload\"    " +
             "    SET    " +
             "        \"lock\" = $1,    " +
             "        \"version\" = $2,    " +
@@ -557,7 +557,7 @@ public class UploadRepository {
                         sql.append("    UPDATE    ")
                                 .append("\"")
                                 .append(DatabaseConfig.TABLE_PREFIX)
-                                .append("file_upload    ")
+                                .append("file_upload")
                                 .append("\"")
                                 .append("    SET    ");
                         for (int i = 0; i < list.size(); i++) {

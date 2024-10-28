@@ -1,6 +1,7 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.common.error.ResourceException;
+import club.p6e.coat.file.FilePermissionService;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.actuator.FileWriteActuator;
@@ -18,7 +19,6 @@ import reactor.core.publisher.Mono;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,20 +55,28 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
     private final FileReadWriteService fileReadWriteService;
 
     /**
+     * 文件权限服务对象
+     */
+    private final FilePermissionService filePermissionService;
+
+    /**
      * 构造方法初始化
      *
-     * @param properties           配置文件对象
-     * @param repository           上传存储库对象
-     * @param fileReadWriteService 文件读取写入服务对象
+     * @param properties            配置文件对象
+     * @param repository            上传存储库对象
+     * @param fileReadWriteService  文件读取写入服务对象
+     * @param filePermissionService 文件权限服务对象
      */
     public SimpleUploadServiceImpl(
             Properties properties,
             UploadRepository repository,
-            FileReadWriteService fileReadWriteService
+            FileReadWriteService fileReadWriteService,
+            FilePermissionService filePermissionService
     ) {
         this.properties = properties;
         this.repository = repository;
         this.fileReadWriteService = fileReadWriteService;
+        this.filePermissionService = filePermissionService;
     }
 
     @Override
@@ -82,53 +90,58 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
                     "execute(...) unable to find corresponding resource context node.")
             );
         }
-        final List<String> nodes = context.get("$node") == null
-                ? List.of() : List.of(context.get("$node").toString().split(","));
-        if (nodes.contains(context.getNode())) {
-            return Mono.error(new ResourceException(
-                    this.getClass(),
-                    "fun execute(SimpleUploadContext context). ==> " +
-                            "execute(...) exception without permission for this node.",
-                    "execute(...) exception without permission for this node.")
-            );
-        }
-        final FilePart filePart = context.getFilePart();
-        context.setFilePart(null);
-        final String name = FileUtil.name(filePart.filename());
-        if (name == null) {
-            return Mono.error(new ParameterException(
-                    this.getClass(),
-                    "fun execute(SimpleUploadContext context). ==> " +
-                            "execute(...) request parameter <name> exception.",
-                    "execute(...) request parameter <name> exception.")
-            );
-        }
-        final UploadModel pum = new UploadModel();
-        final Object operator = context.get("$operator");
-        if (operator instanceof final String content) {
-            pum.setOwner(content);
-            pum.setCreator(content);
-            pum.setModifier(content);
-        }
-        pum.setName(name);
-        pum.setSource(SOURCE);
-        return repository
-                .create(pum)
-                .flatMap(m -> fileReadWriteService.write(name, new HashMap<>() {{
-                    putAll(context);
-                    putAll(upload.getExtend());
-                }}, new CustomFileWriteActuator(filePart, upload)).map(fam -> {
-                    final UploadModel rum = new UploadModel();
-                    rum.setId(m.getId());
-                    rum.setSize(fam.getLength());
-                    rum.setStorageType(fam.getType());
-                    rum.setStorageLocation(fam.getPath());
-                    return rum;
-                })).flatMap(m -> Mono.just(m)
-                        .flatMap(l -> repository.closeLock(m.getId()))
-                        .flatMap(l -> repository.update(m))
-                        .flatMap(l -> repository.findById(m.getId()))
-                ).map(UploadModel::toMap);
+        return filePermissionService
+                .execute("U", context)
+                .flatMap(b -> {
+                    if (b) {
+                        return Mono.defer(() -> {
+                            final FilePart filePart = context.getFilePart();
+                            context.setFilePart(null);
+                            final String name = FileUtil.name(filePart.filename());
+                            if (name == null) {
+                                return Mono.error(new ParameterException(
+                                        this.getClass(),
+                                        "fun execute(SimpleUploadContext context). ==> " +
+                                                "execute(...) request parameter <name> exception.",
+                                        "execute(...) request parameter <name> exception.")
+                                );
+                            }
+                            final UploadModel pum = new UploadModel();
+                            final Object operator = context.get("$operator");
+                            if (operator instanceof final String content) {
+                                pum.setOwner(content);
+                                pum.setCreator(content);
+                                pum.setModifier(content);
+                            }
+                            pum.setName(name);
+                            pum.setSource(SOURCE);
+                            return repository
+                                    .create(pum)
+                                    .flatMap(m -> fileReadWriteService.write(name, new HashMap<>() {{
+                                        putAll(context);
+                                        putAll(upload.getExtend());
+                                    }}, new CustomFileWriteActuator(filePart, upload)).map(fam -> {
+                                        final UploadModel rum = new UploadModel();
+                                        rum.setId(m.getId());
+                                        rum.setSize(fam.getLength());
+                                        rum.setStorageType(fam.getType());
+                                        rum.setStorageLocation(fam.getPath());
+                                        return rum;
+                                    })).flatMap(m -> Mono.just(m)
+                                            .flatMap(l -> repository.closeLock(m.getId()))
+                                            .flatMap(l -> repository.update(m))
+                                            .flatMap(l -> repository.findById(m.getId()))
+                                    ).map(UploadModel::toMap);
+                        });
+                    } else {
+                        return Mono.error(new ResourceException(
+                                this.getClass(),
+                                "fun execute(SimpleUploadContext context). ==> " +
+                                        "execute(...) exception without permission for this node.",
+                                "execute(...) exception without permission for this node.")
+                        );
+                    }
+                });
     }
 
     /**

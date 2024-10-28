@@ -37,7 +37,7 @@ public class DefaultSimpleUploadAspectImpl implements SimpleUploadAspect {
         result.put("id", id);
         result.put("size", size);
         result.put("name", name);
-        result.put("path", FileUtil.composePath(storageLocation, name));
+        result.put("path", storageLocation);
         return Mono.just(true);
     }
 

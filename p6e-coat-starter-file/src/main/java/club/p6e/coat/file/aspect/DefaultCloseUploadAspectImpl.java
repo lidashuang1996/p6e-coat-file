@@ -1,6 +1,5 @@
 package club.p6e.coat.file.aspect;
 
-import club.p6e.coat.file.utils.FileUtil;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -29,16 +28,15 @@ public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
     public Mono<Boolean> after(Map<String, Object> data, Map<String, Object> result) {
         // 对返回的结果数据进行处理
         // 从而屏蔽一些不想给前端用户显示的数据
-        final Object id = result.get("id");
-        final Object size = result.get("size");
-        final String name = String.valueOf(result.get("name"));
         final String storage = String.valueOf(result.get("storageLocation"));
-        final String path = FileUtil.composePath(storage, name);
+        final String name = String.valueOf(result.get("name"));
+        final Object size = result.get("size");
+        final Object id = result.get("id");
         result.clear();
         result.put("id", id);
         result.put("size", size);
         result.put("name", name);
-        result.put("path", path);
+        result.put("path", storage);
         return Mono.just(true);
     }
 
