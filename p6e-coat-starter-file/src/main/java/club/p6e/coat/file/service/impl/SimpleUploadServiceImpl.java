@@ -1,17 +1,19 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.common.error.ResourceException;
+import club.p6e.coat.common.error.ResourceNodeException;
 import club.p6e.coat.file.FilePermissionService;
 import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.Properties;
 import club.p6e.coat.file.actuator.FileWriteActuator;
-import club.p6e.coat.common.error.ResourceNodeException;
-import club.p6e.coat.file.service.SimpleUploadService;
 import club.p6e.coat.file.context.SimpleUploadContext;
-import club.p6e.coat.common.error.ParameterException;
 import club.p6e.coat.file.model.UploadModel;
-import club.p6e.coat.file.utils.FileUtil;
 import club.p6e.coat.file.repository.UploadRepository;
+import club.p6e.coat.file.service.SimpleUploadService;
+import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -38,22 +40,19 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
      * 源
      */
     private static final String SOURCE = "SIMPLE_UPLOAD";
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(SimpleUploadServiceImpl.class);
     /**
      * 配置文件对象
      */
     private final Properties properties;
-
     /**
      * 上传存储库对象
      */
     private final UploadRepository repository;
-
     /**
      * 文件读取写入服务对象
      */
     private final FileReadWriteService fileReadWriteService;
-
     /**
      * 文件权限服务对象
      */
@@ -93,6 +92,7 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
         return filePermissionService
                 .execute("U", context)
                 .flatMap(b -> {
+                    LOGGER.info("permission >>> {}", b);
                     if (b) {
                         return Mono.defer(() -> {
                             final FilePart filePart = context.getFilePart();
@@ -106,6 +106,7 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
                                         "execute(...) request parameter <name> exception.")
                                 );
                             }
+                            LOGGER.info("name >>> {}", name);
                             final UploadModel pum = new UploadModel();
                             final Object operator = context.get("$operator");
                             if (operator instanceof final String content) {
@@ -115,6 +116,7 @@ public class SimpleUploadServiceImpl implements SimpleUploadService {
                             }
                             pum.setName(name);
                             pum.setSource(SOURCE);
+                            LOGGER.info("SAVE DATA >>> {}", pum);
                             return repository
                                     .create(pum)
                                     .flatMap(m -> fileReadWriteService.write(name, new HashMap<>() {{

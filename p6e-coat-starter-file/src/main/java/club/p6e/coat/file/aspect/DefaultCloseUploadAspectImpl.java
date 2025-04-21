@@ -1,5 +1,7 @@
 package club.p6e.coat.file.aspect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +16,8 @@ import java.util.Map;
 @Component
 public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCloseUploadAspectImpl.class);
+
     @Override
     public int order() {
         return 0;
@@ -21,6 +25,7 @@ public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
 
     @Override
     public Mono<Boolean> before(Map<String, Object> data) {
+        LOGGER.info("DefaultCloseUploadAspectImpl.before() >>>>> {}", data);
         return Mono.just(true);
     }
 
@@ -37,6 +42,7 @@ public class DefaultCloseUploadAspectImpl implements CloseUploadAspect {
         result.put("size", size);
         result.put("name", name);
         result.put("path", storage);
+        LOGGER.info("close upload aspect result: {}", result);
         return Mono.just(true);
     }
 

@@ -1,15 +1,17 @@
 package club.p6e.coat.file.service.impl;
 
-import club.p6e.coat.file.FileSignatureService;
-import club.p6e.coat.file.context.SliceUploadContext;
 import club.p6e.coat.common.error.FileException;
+import club.p6e.coat.common.utils.SpringUtil;
+import club.p6e.coat.file.FileSignatureService;
 import club.p6e.coat.file.Properties;
+import club.p6e.coat.file.context.SliceUploadContext;
 import club.p6e.coat.file.model.UploadChunkModel;
 import club.p6e.coat.file.repository.UploadChunkRepository;
 import club.p6e.coat.file.repository.UploadRepository;
 import club.p6e.coat.file.service.SliceUploadService;
 import club.p6e.coat.file.utils.FileUtil;
-import club.p6e.coat.common.utils.SpringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -32,21 +34,19 @@ import java.util.Map;
 )
 public class SliceUploadServiceImpl implements SliceUploadService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SliceUploadServiceImpl.class);
     /**
      * 配置文件对象
      */
     private final Properties properties;
-
     /**
      * 上传存储库对象
      */
     private final UploadRepository uploadRepository;
-
     /**
      * 上传块存储库对象
      */
     private final UploadChunkRepository uploadChunkRepository;
-
     /**
      * 文件签名服务
      */
@@ -92,6 +92,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                             // 如果不存在文件夹就创建文件夹
                             FileUtil.createFolder(absolutePath);
                             final File absolutePathFile = new File(FileUtil.composePath(absolutePath, index + "_" + FileUtil.generateName()));
+                            LOGGER.info("FILE absolutePathFile >>> {}", absolutePathFile);
                             return repository
                                     // 获取锁
                                     .acquireLock(um.getId())
@@ -104,6 +105,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                         })
                         // 验证文件数据
                         .flatMap(f -> {
+                            LOGGER.info("FFF >>> {}", f);
                             final long size = properties.getSliceUpload().getMaxSize();
                             if (f.length() > size) {
                                 FileUtil.deleteFile(f);
@@ -118,6 +120,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                         .flatMap(f -> fileSignatureService
                                 .execute(f)
                                 .flatMap(s -> {
+                                    LOGGER.info("SIGNATURE >>> {}", s);
                                     if (!s.equals(signature)) {
                                         FileUtil.deleteFile(f);
                                         return Mono.error(new FileException(this.getClass(),
@@ -129,6 +132,7 @@ public class SliceUploadServiceImpl implements SliceUploadService {
                                     return Mono.just(f);
                                 }))
                         .flatMap(f -> {
+                            LOGGER.info("FILE F SIZE >>> {}", f);
                             final UploadChunkModel model = new UploadChunkModel();
                             model.setFid(m.getId());
                             model.setName(f.getName());

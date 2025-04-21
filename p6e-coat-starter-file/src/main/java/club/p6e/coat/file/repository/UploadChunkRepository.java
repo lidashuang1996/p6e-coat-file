@@ -2,11 +2,10 @@ package club.p6e.coat.file.repository;
 
 import club.p6e.DatabaseConfig;
 import club.p6e.coat.common.error.DataBaseException;
+import club.p6e.coat.common.utils.TransformationUtil;
 import club.p6e.coat.file.model.UploadChunkModel;
-import io.r2dbc.spi.Connection;
-import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.Statement;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +22,7 @@ import java.time.LocalDateTime;
         value = UploadChunkRepository.class,
         ignored = UploadChunkRepository.class
 )
+@SuppressWarnings("ALL")
 public class UploadChunkRepository {
 
     @SuppressWarnings("ALL")
@@ -40,14 +40,14 @@ public class UploadChunkRepository {
             "            \"version\"    " +
             "        )    " +
             "    VALUES (    " +
-            "            $1,    " +
-            "            $2,    " +
-            "            $3,    " +
-            "            $4,    " +
-            "            $5,    " +
-            "            $6,    " +
-            "            $7,    " +
-            "            $8     " +
+            "            :FID,    " +
+            "            :NAME,    " +
+            "            :SIZE,    " +
+            "            :CREATOR,    " +
+            "            :MODIFIER,    " +
+            "            :CREATOR_DATE_TIME,    " +
+            "            :MODIFICATION_DATE_TIME,    " +
+            "            :VERSION     " +
             "   ) RETURNING id      " +
             "   ;   ";
 
@@ -56,7 +56,7 @@ public class UploadChunkRepository {
             "    DELETE FROM    " +
             "        \"" + DatabaseConfig.TABLE_PREFIX + "file_upload_chunk\"    " +
             "    WHERE    " +
-            "        fid = $1        " +
+            "        fid = :FID        " +
             "    ;    ";
 
     @SuppressWarnings("ALL")
@@ -74,24 +74,24 @@ public class UploadChunkRepository {
             "    FROM    " +
             "        \"" + DatabaseConfig.TABLE_PREFIX + "file_upload_chunk\"    " +
             "    WHERE    " +
-            "        \"id\" > $1 AND \"creation_date_time\" < $2    " +
+            "        \"id\" > :ID AND \"creation_date_time\" < :CREATION_DATE_TIME    " +
             "    ORDER BY    " +
             "        \"id\" AES    " +
             "    ;    ";
 
 
     /**
-     * ConnectionFactory 对象
+     * DatabaseClient 对象
      */
-    private final ConnectionFactory factory;
+    private final DatabaseClient client;
 
     /**
      * 构造方法初始化
      *
-     * @param factory ConnectionFactory 对象
+     * @param client DatabaseClient 对象
      */
-    public UploadChunkRepository(ConnectionFactory factory) {
-        this.factory = factory;
+    public UploadChunkRepository(DatabaseClient client) {
+        this.client = client;
     }
 
     /**
@@ -130,18 +130,24 @@ public class UploadChunkRepository {
         if (model.getModifier() == null) {
             model.setModifier("sys");
         }
-        return Mono.usingWhen(this.factory.create(), connection -> {
-            final Statement statement = connection.createStatement(CREATE_SQL);
-            statement.bind("$1", model.getFid());
-            statement.bind("$2", model.getName());
-            statement.bind("$3", model.getSize());
-            statement.bind("$4", model.getCreator());
-            statement.bind("$5", model.getModifier());
-            statement.bind("$6", model.getCreationDateTime());
-            statement.bind("$7", model.getModificationDateTime());
-            statement.bind("$8", model.getVersion());
-            return Mono.from(statement.execute()).flatMap(result -> Mono.from(result.map((row, metadata) -> row.get("id", Integer.class))));
-        }, Connection::close).flatMap(id -> Mono.just(model.setId(id)));
+        return client
+                .sql(CREATE_SQL)
+                .bind("FID", model.getFid())
+                .bind("NAME", model.getName())
+                .bind("SIZE", model.getSize())
+                .bind("CREATOR", model.getCreator())
+                .bind("MODIFIER", model.getModifier())
+                .bind("CREATOR_DATE_TIME", model.getCreationDateTime())
+                .bind("MODIFICATION_DATE_TIME", model.getModificationDateTime())
+                .bind("VERSION", model.getVersion())
+                .fetch()
+                .first()
+                .map(row -> model.setId(TransformationUtil.objectToInteger(row.get("id"))))
+                .switchIfEmpty(Mono.error(new DataBaseException(
+                        this.getClass(),
+                        "fun create(UploadChunkModel model). ==> create(...) create data is null.",
+                        "create(...) create data is null."
+                )));
     }
 
     /**
@@ -150,11 +156,8 @@ public class UploadChunkRepository {
      * @param fid FID
      * @return Mono<Long> 删除的数据条数
      */
-    public Mono<Long> deleteByFid(int fid) {
-        return Mono
-                .from(this.factory.create())
-                .flatMap(connection -> Mono.from(connection.createStatement(FID_BY_DELETE_SQL).bind("$1", fid).execute()))
-                .flatMap(result -> Mono.from(result.getRowsUpdated()));
+    public Mono<Long> deleteByFid(Integer fid) {
+        return client.sql(FID_BY_DELETE_SQL).bind("FID", fid).fetch().rowsUpdated();
     }
 
     /**
@@ -165,27 +168,25 @@ public class UploadChunkRepository {
      * @return Mono<UploadChunkModel> 模型对象
      */
     public Mono<UploadChunkModel> selectExpireData(Integer id, LocalDateTime localDateTime) {
-        return Mono
-                .from(this.factory.create())
-                .flatMap(connection -> {
-                    final Statement statement = connection.createStatement(EXPIRE_SELECT_SQL);
-                    statement.bind("$1", id);
-                    statement.bind("$2", localDateTime);
-                    return Mono.from(statement.execute());
-                })
-                .flatMap(r -> Mono.from(r.map((row, metadata) -> {
+        return client
+                .sql(EXPIRE_SELECT_SQL)
+                .bind("ID", id)
+                .bind("CREATION_DATE_TIME", localDateTime)
+                .fetch()
+                .first()
+                .map(row -> {
                     final UploadChunkModel model = new UploadChunkModel();
-                    model.setId(row.get("id", Integer.class));
-                    model.setFid(row.get("fid", Integer.class));
-                    model.setName(row.get("name", String.class));
-                    model.setSize(row.get("size", Long.class));
-                    model.setCreator(row.get("creator", String.class));
-                    model.setCreationDateTime(row.get("creation_date_time", LocalDateTime.class));
-                    model.setModifier(row.get("modifier", String.class));
-                    model.setModificationDateTime(row.get("modification_date_time", LocalDateTime.class));
-                    model.setVersion(row.get("version", Integer.class));
+                    model.setId(TransformationUtil.objectToInteger(row.get("id")));
+                    model.setFid(TransformationUtil.objectToInteger(row.get("fid")));
+                    model.setName(TransformationUtil.objectToString(row.get("name")));
+                    model.setSize(TransformationUtil.objectToLong(row.get("size")));
+                    model.setCreator(TransformationUtil.objectToString(row.get("creator")));
+                    model.setCreationDateTime(TransformationUtil.objectToLocalDateTime(row.get("creation_date_time")));
+                    model.setModifier(TransformationUtil.objectToString(row.get("modifier")));
+                    model.setModificationDateTime(TransformationUtil.objectToLocalDateTime(row.get("modification_date_time")));
+                    model.setVersion(TransformationUtil.objectToInteger(row.get("version")));
                     return model;
-                })));
+                });
     }
 
 }

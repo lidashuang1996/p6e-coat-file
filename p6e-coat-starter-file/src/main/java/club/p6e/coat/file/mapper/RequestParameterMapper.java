@@ -4,6 +4,8 @@ import club.p6e.coat.common.utils.SpringUtil;
 import club.p6e.coat.common.error.RequestParameterMapperException;
 import club.p6e.coat.common.error.TypeMismatchException;
 import club.p6e.coat.common.utils.JsonUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
@@ -52,6 +54,8 @@ public abstract class RequestParameterMapper {
      */
     private static final Map<Class<?>, RequestParameterMapper> CACHE = new Hashtable<>();
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestParameterMapper.class);
+
     /**
      * 获取映射后的数据类型对象
      *
@@ -79,6 +83,7 @@ public abstract class RequestParameterMapper {
                     .execute(request)
                     .flatMap(o -> {
                         if (o.getClass() == oClass) {
+                            LOGGER.info("RequestParameterMapper >>>> " + oClass + " ==> " + o + " <<<<");
                             return Mono.just((T) o);
                         } else {
                             return Mono.error(new TypeMismatchException(

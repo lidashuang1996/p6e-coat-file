@@ -1,11 +1,13 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.common.error.ParameterException;
-import club.p6e.coat.file.service.OpenUploadService;
 import club.p6e.coat.file.context.OpenUploadContext;
 import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadRepository;
+import club.p6e.coat.file.service.OpenUploadService;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -30,6 +32,8 @@ public class OpenUploadServiceImpl implements OpenUploadService {
      * 源
      */
     private static final String SOURCE = "SLICE_UPLOAD";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OpenUploadServiceImpl.class);
 
     /**
      * 上传存储库对象
@@ -65,6 +69,7 @@ public class OpenUploadServiceImpl implements OpenUploadService {
         }
         model.setName(name);
         model.setSource(SOURCE);
+        LOGGER.info("OpenUploadServiceImpl >>>>>>>>> NAME >>>> {}", name);
         return repository.create(model).map(UploadModel::toMap);
     }
 

@@ -1,6 +1,8 @@
 package club.p6e.coat.file.aspect;
 
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -15,6 +17,8 @@ import java.util.Map;
 @Component
 public class DefaultSimpleUploadAspectImpl implements SimpleUploadAspect {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSimpleUploadAspectImpl.class);
+
     @Override
     public int order() {
         return 0;
@@ -22,6 +26,7 @@ public class DefaultSimpleUploadAspectImpl implements SimpleUploadAspect {
 
     @Override
     public Mono<Boolean> before(Map<String, Object> data) {
+        LOGGER.info("DefaultSimpleUploadAspectImpl.before() >>>>> {}", data);
         return Mono.just(true);
     }
 
@@ -38,6 +43,7 @@ public class DefaultSimpleUploadAspectImpl implements SimpleUploadAspect {
         result.put("size", size);
         result.put("name", name);
         result.put("path", storageLocation);
+        LOGGER.info("DefaultSimpleUploadAspectImpl.after() >>>>> {}", result);
         return Mono.just(true);
     }
 

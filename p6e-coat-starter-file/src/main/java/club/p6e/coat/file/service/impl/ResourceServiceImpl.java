@@ -1,14 +1,16 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.common.error.ResourceException;
-import club.p6e.coat.file.FilePermissionService;
-import club.p6e.coat.file.actuator.FileReadActuator;
-import club.p6e.coat.file.FileReadWriteService;
-import club.p6e.coat.file.service.ResourceService;
-import club.p6e.coat.file.context.ResourceContext;
 import club.p6e.coat.common.error.ResourceNodeException;
+import club.p6e.coat.file.FilePermissionService;
+import club.p6e.coat.file.FileReadWriteService;
 import club.p6e.coat.file.Properties;
+import club.p6e.coat.file.actuator.FileReadActuator;
+import club.p6e.coat.file.context.ResourceContext;
+import club.p6e.coat.file.service.ResourceService;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -30,16 +32,15 @@ import java.util.Map;
 )
 public class ResourceServiceImpl implements ResourceService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResourceServiceImpl.class);
     /**
      * 配置文件对象
      */
     private final Properties properties;
-
     /**
      * 文件读写服务对象
      */
     private final FileReadWriteService fileReadWriteService;
-
     /**
      * 文件权限服务对象
      */
@@ -76,12 +77,15 @@ public class ResourceServiceImpl implements ResourceService {
             return filePermissionService
                     .execute("R", context)
                     .flatMap(b -> {
+                        LOGGER.info("permission >>> {}", b);
                         if (b) {
                             final String path = context.getPath();
                             final String suffix = FileUtil.getSuffix(path);
                             final Map<String, MediaType> suffixes = resource.getSuffixes();
+                            LOGGER.info(" path : {}, suffix: {}, suffixes: {}", path, suffix, suffixes);
                             if (suffixes.get(suffix) != null) {
                                 final MediaType mediaType = suffixes.get(suffix);
+                                LOGGER.info("fileReadWriteService.read()");
                                 return fileReadWriteService.read(
                                         resource.getType(),
                                         resource.getPath(),

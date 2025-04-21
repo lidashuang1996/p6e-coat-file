@@ -5,6 +5,8 @@ import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.actuator.FileWriteActuator;
 import club.p6e.coat.common.error.ResourceNodeException;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
@@ -27,6 +29,8 @@ import java.util.Map;
         ignored = FileReadWriteServiceImpl.class
 )
 public class FileReadWriteServiceImpl implements FileReadWriteService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(FileReadWriteServiceImpl.class);
 
     /**
      * DISK 资源类型
@@ -55,6 +59,7 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
     ) {
         final String type = fileWriteActuator.type();
         if (DISK_RESOURCE_TYPE.equalsIgnoreCase(type)) {
+            LOGGER.info("FILE WWW >> {}", type);
             final String path = folderStorageLocationPathService.path();
             final String relativePath = FileUtil.composePath(path, name);
             final String absolutePath = FileUtil.convertAbsolutePath(FileUtil.composePath(fileWriteActuator.path(), relativePath));
@@ -63,12 +68,15 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
             if (!FileUtil.checkFolderExist(folder)) {
                 FileUtil.createFolder(folder);
             }
+            LOGGER.info("FILE file >> {}", file);
+            LOGGER.info("FILE folder >> {}", folder);
             return fileWriteActuator.execute(file).flatMap(f -> {
                 final FileActuatorModel fam = new FileActuatorModel();
                 fam.setName(name);
                 fam.setPath(relativePath);
                 fam.setLength(f.length());
                 fam.setType(DISK_RESOURCE_TYPE);
+                LOGGER.info("FILE fam >> {}", fam);
                 return Mono.just(fam);
             });
         } else {
@@ -90,6 +98,7 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
             Map<String, Object> extend
     ) {
         if (DISK_RESOURCE_TYPE.equalsIgnoreCase(type)) {
+            LOGGER.info("FILE read >> {}", type);
             final File file = new File(FileUtil.composePath(base, path));
             return Mono.just(new FileReadActuator() {
 
@@ -109,11 +118,13 @@ public class FileReadWriteServiceImpl implements FileReadWriteService {
 
                 @Override
                 public Flux<DataBuffer> execute() {
+                    LOGGER.info("FILE read execute >> {}", file);
                     return FileUtil.readFile(file);
                 }
 
                 @Override
                 public Flux<DataBuffer> execute(long position, long size) {
+                    LOGGER.info("FILE read execute >> {}/{} >>> {}", position, size, file);
                     return FileUtil.readFile(file, position, size);
                 }
 

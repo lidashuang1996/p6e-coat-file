@@ -1,13 +1,15 @@
 package club.p6e.coat.file.service.impl;
 
+import club.p6e.coat.common.error.DownloadNodeException;
 import club.p6e.coat.common.error.ResourceException;
 import club.p6e.coat.file.FilePermissionService;
-import club.p6e.coat.file.actuator.FileReadActuator;
 import club.p6e.coat.file.FileReadWriteService;
-import club.p6e.coat.file.service.DownloadService;
-import club.p6e.coat.file.context.DownloadContext;
-import club.p6e.coat.common.error.DownloadNodeException;
 import club.p6e.coat.file.Properties;
+import club.p6e.coat.file.actuator.FileReadActuator;
+import club.p6e.coat.file.context.DownloadContext;
+import club.p6e.coat.file.service.DownloadService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -27,6 +29,8 @@ import java.util.HashMap;
         ignored = DownloadServiceImpl.class
 )
 public class DownloadServiceImpl implements DownloadService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DownloadServiceImpl.class);
 
     /**
      * 配置文件对象
@@ -74,7 +78,9 @@ public class DownloadServiceImpl implements DownloadService {
             return filePermissionService
                     .execute("D", context)
                     .flatMap(b -> {
+                        LOGGER.info("permission >>> {}", b);
                         if (b) {
+                            LOGGER.info("fileReadWriteService.read()");
                             return fileReadWriteService.read(
                                     download.getType(),
                                     download.getPath(),

@@ -2,6 +2,8 @@ package club.p6e.coat.file;
 
 import club.p6e.coat.common.utils.GeneratorUtil;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,8 @@ import java.time.format.DateTimeFormatter;
 )
 public class FolderStorageLocationPathServiceImpl implements FolderStorageLocationPathService {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(FolderStorageLocationPathServiceImpl.class);
+
     /**
      * 时间格式化对象
      */
@@ -28,6 +32,7 @@ public class FolderStorageLocationPathServiceImpl implements FolderStorageLocati
 
     @Override
     public String path() {
+        LOGGER.info("path >>>>>>>>>>>>>");
         // 文件路径由时间 + UUID 生成
         return FileUtil.composePath(DATE_TIME_FORMATTER.format(LocalDateTime.now()),
                 GeneratorUtil.uuid() + GeneratorUtil.random(6, true, false));

@@ -29,6 +29,13 @@
         </dependency>
         <!--  R2DBC PostGreSQL [END]  -->
 
+        <!-- Spring R2DBC [ START ] -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <!-- Spring R2DBC [ END ] -->
+
         <!--  Spring Boot Web Flux [START]  -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,5 +1,7 @@
 package club.p6e.coat.file.aspect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
@@ -14,6 +16,9 @@ import java.util.Map;
 @Component
 public class DefaultOpenUploadAspectImpl implements OpenUploadAspect {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultOpenUploadAspectImpl.class);
+
+
     @Override
     public int order() {
         return 0;
@@ -21,6 +26,7 @@ public class DefaultOpenUploadAspectImpl implements OpenUploadAspect {
 
     @Override
     public Mono<Boolean> before(Map<String, Object> data) {
+        LOGGER.info("DefaultOpenUploadAspectImpl.before() >>>>> {}", data);
         return Mono.just(true);
     }
 
@@ -31,6 +37,7 @@ public class DefaultOpenUploadAspectImpl implements OpenUploadAspect {
         final Object id = result.get("id");
         result.clear();
         result.put("id", id);
+        LOGGER.info("DefaultOpenUploadAspectImpl.after() >>>>> {}", result);
         return Mono.just(true);
     }
 

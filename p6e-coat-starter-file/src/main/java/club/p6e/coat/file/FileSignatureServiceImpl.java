@@ -2,6 +2,8 @@ package club.p6e.coat.file;
 
 import club.p6e.coat.common.error.FileException;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,8 @@ import java.security.MessageDigest;
 )
 public class FileSignatureServiceImpl implements FileSignatureService {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(FileSignatureServiceImpl.class);
+
     /**
      * HEX_CHARS
      */
@@ -31,6 +35,7 @@ public class FileSignatureServiceImpl implements FileSignatureService {
 
     @Override
     public Mono<String> execute(File file) {
+        LOGGER.info("FileSignatureServiceImpl   :::: file >>>>>>>>>>>>> {}", file);
         final FileSignatureService.DigestAlgorithm digestAlgorithm = new DefaultDigestAlgorithm();
         return Mono.just(file)
                 .flatMap(f -> FileUtil.checkFileExist(f) ? Mono.just(f) : Mono.error(new FileException(
@@ -47,9 +52,11 @@ public class FileSignatureServiceImpl implements FileSignatureService {
                                 final byte[] bytes = new byte[count];
                                 buffer.read(bytes);
                                 digestAlgorithm.input(bytes);
+                                LOGGER.info("FileSignatureServiceImpl   :::: md5 file >>>>>>>>>>>>> {}", file);
                                 return Mono.just(count);
                             } finally {
                                 DataBufferUtils.release(buffer);
+                                LOGGER.info("FileSignatureServiceImpl   :::: release  file {}", file);
                             }
                         }).count())
                 .map(l -> digestAlgorithmBytesToHexString(digestAlgorithm.output()));

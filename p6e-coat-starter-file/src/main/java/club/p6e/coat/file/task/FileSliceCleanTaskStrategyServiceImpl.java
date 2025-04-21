@@ -77,6 +77,7 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
 
     private void execute1() {
         try {
+            LOGGER.info("[ FILE TASK START ] >>> ");
             final AtomicInteger index = new AtomicInteger(0);
             final Properties.SliceUpload sliceUpload = properties.getSliceUpload();
             while (true) {
@@ -91,6 +92,7 @@ public class FileSliceCleanTaskStrategyServiceImpl implements FileSliceCleanTask
                     uploadChunkRepository.deleteByFid(model.getFid()).block();
                 }
             }
+            LOGGER.info("[ FILE TASK END ] !!");
         } catch (Exception e) {
             LOGGER.error("[ FILE TASK ERROR ] >>> ", e);
         }

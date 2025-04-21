@@ -1,5 +1,7 @@
 package club.p6e.coat.file.aspect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -19,6 +21,8 @@ import java.util.Map;
 )
 public class DefaultSliceUploadAspectImpl implements SliceUploadAspect {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSliceUploadAspectImpl.class);
+
     @Override
     public int order() {
         return 0;
@@ -26,6 +30,7 @@ public class DefaultSliceUploadAspectImpl implements SliceUploadAspect {
 
     @Override
     public Mono<Boolean> before(Map<String, Object> data) {
+        LOGGER.info("DefaultSliceUploadAspectImpl.before() >>>>> {}", data);
         return Mono.just(true);
     }
 
@@ -42,6 +47,7 @@ public class DefaultSliceUploadAspectImpl implements SliceUploadAspect {
         result.put("fid", fid);
         result.put("name", name);
         result.put("size", size);
+        LOGGER.info("DefaultSliceUploadAspectImpl.after() >>>>> {}", result);
         return Mono.just(true);
     }
 

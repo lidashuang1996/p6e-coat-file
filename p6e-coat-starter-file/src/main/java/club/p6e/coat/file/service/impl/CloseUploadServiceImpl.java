@@ -1,16 +1,18 @@
 package club.p6e.coat.file.service.impl;
 
 import club.p6e.coat.common.error.ResourceException;
+import club.p6e.coat.common.error.ResourceNodeException;
 import club.p6e.coat.file.FilePermissionService;
 import club.p6e.coat.file.FileReadWriteService;
-import club.p6e.coat.file.actuator.FileWriteActuator;
-import club.p6e.coat.common.error.ResourceNodeException;
-import club.p6e.coat.file.model.UploadModel;
-import club.p6e.coat.file.service.CloseUploadService;
-import club.p6e.coat.file.context.CloseUploadContext;
 import club.p6e.coat.file.Properties;
+import club.p6e.coat.file.actuator.FileWriteActuator;
+import club.p6e.coat.file.context.CloseUploadContext;
+import club.p6e.coat.file.model.UploadModel;
 import club.p6e.coat.file.repository.UploadRepository;
+import club.p6e.coat.file.service.CloseUploadService;
 import club.p6e.coat.file.utils.FileUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -32,6 +34,8 @@ import java.util.Map;
         ignored = CloseUploadServiceImpl.class
 )
 public class CloseUploadServiceImpl implements CloseUploadService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CloseUploadServiceImpl.class);
 
     /**
      * 配置文件对象
@@ -87,6 +91,7 @@ public class CloseUploadServiceImpl implements CloseUploadService {
         return filePermissionService
                 .execute("U", context)
                 .flatMap(b -> {
+                    LOGGER.info("permission >>> {}", b);
                     if (b) {
                         return repository
                                 .closeLock(context.getId())
@@ -96,10 +101,12 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                                     if (operator instanceof final String content) {
                                         m.setModifier(content);
                                     }
+                                    LOGGER.info("operator >>> {}", operator);
                                     // 文件夹绝对路径
                                     final String absolutePath = FileUtil.convertAbsolutePath(
                                             FileUtil.composePath(properties.getSliceUpload().getPath(), String.valueOf(m.getId()))
                                     );
+                                    LOGGER.info("absolutePath >>> {}", absolutePath);
                                     final File[] files = FileUtil.readFolder(absolutePath);
                                     for (int i = 0; i < files.length; i++) {
                                         for (int j = i; j < files.length; j++) {
@@ -114,6 +121,7 @@ public class CloseUploadServiceImpl implements CloseUploadService {
                                             }
                                         }
                                     }
+                                    LOGGER.info("fileReadWriteServicefileReadWriteService >>> {}", fileReadWriteService);
                                     return fileReadWriteService
                                             .write(m.getName(), new HashMap<>() {{
                                                 putAll(context);
